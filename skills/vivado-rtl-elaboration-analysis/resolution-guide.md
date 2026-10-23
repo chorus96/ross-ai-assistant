@@ -1,176 +1,212 @@
+<!-- ko-translation: enabled -->
 # Resolution Guide - Oasys Synthesis Messages
+# 해결 가이드 - Oasys 합성 메시지
 
 This file maps **all 551 Oasys synthesis message IDs** from testcases to resolution patterns.
+이 파일은 테스트 케이스의 **모든 551개 Oasys 합성 메시지 ID**를 해결 패턴에 매핑합니다.
 
 ---
 
 ## Overview
+## 개요
 
 Resolution guides are pre-written, validated fix templates for known message types.
+해결 가이드는 알려진 메시지 유형에 대해 미리 작성되고 검증된 수정 템플릿입니다.
 They provide:
+그들은 다음을 제공합니다:
 
 - **Consistency** - Same message type always gets the same fix pattern
+- **일관성** - 동일한 메시지 유형은 항상 동일한 수정 패턴을 갖습니다.
 - **Accuracy** - Fixes validated against IEEE standards and Xilinx documentation
+- **정확성** - IEEE 표준 및 Xilinx 문서에 대해 검증된 수정 사항
 - **Completeness** - Includes rationale, multiple fix options, and verification
+- **완전성** - 근거, 여러 수정 옵션 및 확인이 포함됩니다.
 - **Speed** - Pre-written templates reduce analysis time
+- **속도** - 미리 작성된 템플릿으로 분석 시간 단축
 
 ---
 
 ## ID Coverage Summary
+## ID 적용 범위 요약
 
-| Severity | Count | ID Range |
+| Severity<br>심각도 | Count<br>개수 | ID Range<br>ID 범위 |
 |----------|-------|----------|
-| **Critical Warnings** | 8 | 4442, 5796, 5967, 6030, 6781, 6790, 6858, 13329 |
-| **Errors** | 457 | 27-13331 |
-| **Warnings** | 86 | 85-13374 |
-| **Total** | **551** | |
+| **Critical Warnings**<br>**중요한 경고** | 8 | 4442, 5796, 5967, 6030, 6781, 6790, 6858, 13329 |
+| **Errors**<br>**오류** | 457 | 27-13331 |
+| **Warnings**<br>**경고** | 86 | 85-13374 |
+| **Total**<br>**합계** | **551** | |
 
 ---
 
 ## Resolution Pattern Categories
+## 해상도 패턴 카테고리
 
 ### Category 1: Declaration Issues
+### 카테고리 1: 선언 문제
 **Pattern**: Signal/variable/module not found or already declared
+**패턴**: 신호/변수/모듈을 찾을 수 없거나 이미 선언되었습니다.
 
-| Oasys ID | Issue | Fix Pattern |
+| Oasys ID<br>오아시스 아이디 | Issue<br>이슈 | Fix Pattern<br>패턴 수정 |
 |----------|-------|-------------|
-| 36 | not declared | Add declaration; check spelling and scope |
-| 258 | duplicate association | Remove duplicate |
-| 439 | module not found | Add file to project; fix typo |
-| 470 | no interface found | Add interface definition |
-| 478 | no matching signal for .* | Add matching signal |
-| 485 | no port on instance | Fix port name |
-| 493 | no such design unit | Add missing file |
-| 660 | unable to resolve | Fix typo; check scope |
+| 36 | not declared<br>선언되지 않음 | Add declaration; check spelling and scope<br>선언을 추가합니다. 철자와 범위를 확인하세요 |
+| 258 | duplicate association<br>중복 연관 | Remove duplicate<br>중복 제거 |
+| 439 | module not found<br>모듈을 찾을 수 없습니다 | Add file to project; fix typo<br>프로젝트에 파일을 추가합니다. 오타 수정 |
+| 470 | no interface found<br>인터페이스를 찾을 수 없습니다 | Add interface definition<br>인터페이스 정의 추가 |
+| 478 | no matching signal for .*<br>.*에 대해 일치하는 신호가 없습니다. | Add matching signal<br>일치하는 신호 추가 |
+| 485 | no port on instance<br>인스턴스에 포트 없음 | Fix port name<br>포트 이름 수정 |
+| 493 | no such design unit<br>그런 디자인 단위가 없습니다 | Add missing file<br>누락된 파일 추가 |
+| 660 | unable to resolve<br>해결할 수 없다 | Fix typo; check scope<br>오타를 수정하세요. 범위를 확인하세요 |
 
 ### Category 2: Constant Expression Issues
+### 카테고리 2: 상수 표현식 문제
 **Pattern**: Expression must be constant for synthesis
+**패턴**: 합성을 위해서는 발현이 일정해야 합니다.
 
-| Oasys ID | Issue | Fix Pattern |
+| Oasys ID<br>오아시스 아이디 | Issue<br>이슈 | Fix Pattern<br>패턴 수정 |
 |----------|-------|-------------|
-| 35 | not a constant | Use parameter/localparam |
-| 196 | conditional not constant | Use constant condition |
-| 206 | constant expression required | Replace variable with constant |
-| 211 | could not evaluate expression | Simplify; use constants |
-| 279 | generate expression not constant | Use parameter |
-| 280 | expression must be constant | Use constant value |
-| 521 | parameter not constant | Use compile-time constant |
-| 561 | range expression not constant | Use parameter for bounds |
+| 35 | not a constant<br>상수가 아닌 | Use parameter/localparam<br>매개변수/localparam 사용 |
+| 196 | conditional not constant<br>조건부 상수가 아님 | Use constant condition<br>상수 조건 사용 |
+| 206 | constant expression required<br>상수 표현이 필요함 | Replace variable with constant<br>변수를 상수로 바꾸기 |
+| 211 | could not evaluate expression<br>표현을 평가할 수 없습니다 | Simplify; use constants<br>단순화하다; 상수를 사용하다 |
+| 279 | generate expression not constant<br>상수가 아닌 표현식 생성 | Use parameter<br>매개변수 사용 |
+| 280 | expression must be constant<br>표현식은 일정해야 합니다. | Use constant value<br>상수 값 사용 |
+| 521 | parameter not constant<br>매개변수가 일정하지 않음 | Use compile-time constant<br>컴파일 타임 상수 사용 |
+| 561 | range expression not constant<br>범위 표현식이 상수가 아님 | Use parameter for bounds<br>경계에 매개변수 사용 |
 
 ### Category 3: Width/Type Mismatch Issues
+### 카테고리 3: 너비/유형 불일치 문제
 **Pattern**: Signal widths or types don't match
+**패턴**: 신호 폭 또는 유형이 일치하지 않습니다.
 
-| Oasys ID | Issue | Fix Pattern |
+| Oasys ID<br>오아시스 아이디 | Issue<br>이슈 | Fix Pattern<br>패턴 수정 |
 |----------|-------|-------------|
-| 83 | packed union size mismatch | Pad to equal width |
-| 281 | must be packed type | Add `packed` keyword |
-| 421 | array size mismatch | Match dimensions |
-| 509 | operand length mismatch | Resize operands |
-| 549 | port width mismatch | Resize signal or add slice |
-| 550 | instance array width mismatch | Match width to port x count |
-| 658 | type mismatch for port | Fix type compatibility |
-| 659 | type mismatch | Add cast or change type |
-| 690 | width mismatch in assignment | Resize source/target |
-| 689 | port connection width mismatch | Resize or slice |
+| 83 | packed union size mismatch<br>포장된 조합 크기 불일치 | Pad to equal width<br>너비를 동일하게 패드 |
+| 281 | must be packed type<br>포장형이어야 합니다. | Add `packed` keyword<br>`packed` 키워드 추가 |
+| 421 | array size mismatch<br>배열 크기 불일치 | Match dimensions<br>차원 일치 |
+| 509 | operand length mismatch<br>피연산자 길이 불일치 | Resize operands<br>피연산자 크기 조정 |
+| 549 | port width mismatch<br>포트 너비 불일치 | Resize signal or add slice<br>신호 크기 조정 또는 슬라이스 추가 |
+| 550 | instance array width mismatch<br>인스턴스 배열 너비 불일치 | Match width to port x count<br>너비를 포트 x 개수와 일치 |
+| 658 | type mismatch for port<br>포트 유형 불일치 | Fix type compatibility<br>유형 호환성 수정 |
+| 659 | type mismatch<br>유형 불일치 | Add cast or change type<br>캐스트 추가 또는 유형 변경 |
+| 690 | width mismatch in assignment<br>할당의 너비 불일치 | Resize source/target<br>소스/타겟 크기 조정 |
+| 689 | port connection width mismatch<br>포트 연결 폭 불일치 | Resize or slice<br>크기 조정 또는 슬라이스 |
 
 ### Category 4: Part-Select/Index Issues
+### 카테고리 4: 부품 선택/인덱스 문제
 **Pattern**: Array/vector indexing errors
+**패턴**: 배열/벡터 인덱싱 오류
 
-| Oasys ID | Issue | Fix Pattern |
+| Oasys ID<br>오아시스 아이디 | Issue<br>이슈 | Fix Pattern<br>패턴 수정 |
 |----------|-------|-------------|
-| 248 | slice direction mismatch | Fix [MSB:LSB] direction |
-| 324 | index out of range | Fix bounds |
-| 523 | part-select mismatch | Match declaration direction |
-| 524 | part-select out of range | Adjust bounds |
-| 354 | integer overflow | Reduce array size |
+| 248 | slice direction mismatch<br>슬라이스 방향 불일치 | Fix [MSB:LSB] direction<br>[MSB:LSB] 방향 수정 |
+| 324 | index out of range<br>범위를 벗어난 인덱스 | Fix bounds<br>경계 수정 |
+| 523 | part-select mismatch<br>부분 선택 불일치 | Match declaration direction<br>일치 선언 방향 |
+| 524 | part-select out of range<br>범위를 벗어난 부분 선택 | Adjust bounds<br>경계 조정 |
+| 354 | integer overflow<br>정수 오버플로 | Reduce array size<br>배열 크기 줄이기 |
 
 ### Category 5: Case Statement Issues
+### 카테고리 5: 사례 진술서 문제
 **Pattern**: Case/switch statement problems
+**패턴**: Case/switch 문 문제
 
-| Oasys ID | Issue | Fix Pattern |
+| Oasys ID<br>오아시스 아이디 | Issue<br>이슈 | Fix Pattern<br>패턴 수정 |
 |----------|-------|-------------|
-| 151 | case item unreachable | Remove or reorder |
-| 153 | case item never executed | Remove dead item |
-| 426 | missing choices | Add missing cases or default |
-| 517 | overlapping choice | Make values unique |
-| 1875 | duplicate default | Remove extra default |
+| 151 | case item unreachable<br>케이스 항목에 연결할 수 없음 | Remove or reorder<br>제거 또는 재정렬 |
+| 153 | case item never executed<br>케이스 항목이 실행되지 않음 | Remove dead item<br>죽은 항목 제거 |
+| 426 | missing choices<br>누락된 선택 | Add missing cases or default<br>누락된 케이스 또는 기본값 추가 |
+| 517 | overlapping choice<br>중복 선택 | Make values unique<br>가치를 고유하게 만드세요 |
+| 1875 | duplicate default<br>중복 기본값 | Remove extra default<br>추가 기본값 제거 |
 
 ### Category 6: Latch Inference Issues
+### 범주 6: 래치 추론 문제
 **Pattern**: Unintended latch inferred
+**패턴**: 의도하지 않은 래치가 추론됨
 
-| Oasys ID | Issue | Fix Pattern |
+| Oasys ID<br>오아시스 아이디 | Issue<br>이슈 | Fix Pattern<br>패턴 수정 |
 |----------|-------|-------------|
-| 90 | always_latch no latch | Check inference conditions |
-| 264 | latch enable always disabled | Check enable; may be dead code |
-| 327 | inferring latch | Add `else`/`default` clause |
+| 90 | always_latch no latch<br>Always_latch 래치 없음 | Check inference conditions<br>추론 조건 확인 |
+| 264 | latch enable always disabled<br>래치 활성화는 항상 비활성화됩니다. | Check enable; may be dead code<br>활성화를 확인하십시오. 죽은 코드일 수도 있습니다 |
+| 327 | inferring latch<br>래치 추론 | Add `else`/`default` clause<br>`else`/`default` 절 추가 |
 
 ### Category 7: Clock/Timing Issues
+### 카테고리 7: 클록/타이밍 문제
 **Pattern**: Clock or event control problems
+**패턴**: 시계 또는 이벤트 제어 문제
 
-| Oasys ID | Issue | Fix Pattern |
+| Oasys ID<br>오아시스 아이디 | Issue<br>이슈 | Fix Pattern<br>패턴 수정 |
 |----------|-------|-------------|
-| 85 | no event control | Add `@(*)` or sensitivity list |
-| 91 | ambiguous clock | Use single edge |
-| 434 | mixed level/edge triggers | Separate blocks |
-| 462 | no clock in event control | Add clock signal |
-| 567 | signal not in sensitivity | Add to sensitivity list |
-| 614 | signal not in sensitivity | Add to sensitivity list |
+| 85 | no event control<br>이벤트 제어 없음 | Add `@(*)` or sensitivity list<br>`@(*)` 또는 민감도 목록 추가 |
+| 91 | ambiguous clock<br>모호한 시계 | Use single edge<br>단일 모서리 사용 |
+| 434 | mixed level/edge triggers<br>혼합 레벨/에지 트리거 | Separate blocks<br>별도의 블록 |
+| 462 | no clock in event control<br>이벤트 제어에 시계가 없습니다. | Add clock signal<br>클럭 신호 추가 |
+| 567 | signal not in sensitivity<br>신호가 민감하지 않음 | Add to sensitivity list<br>민감도 목록에 추가 |
+| 614 | signal not in sensitivity<br>신호가 민감하지 않음 | Add to sensitivity list<br>민감도 목록에 추가 |
 
 ### Category 8: Loop/Recursion Issues
+### 범주 8: 루프/재귀 문제
 **Pattern**: Infinite or unsupported iteration
+**패턴**: 무한하거나 지원되지 않는 반복
 
-| Oasys ID | Issue | Fix Pattern |
+| Oasys ID<br>오아시스 아이디 | Issue<br>이슈 | Fix Pattern<br>패턴 수정 |
 |----------|-------|-------------|
-| 120 | call depth exceeded | Reduce recursion; flatten |
-| 316 | module recursion | Remove circular instantiation |
-| 317 | recursive instantiation | Flatten hierarchy |
-| 403 | loop limit exceeded | Add iteration limit |
+| 120 | call depth exceeded<br>통화 심도를 초과했습니다. | Reduce recursion; flatten<br>재귀를 줄입니다. 평평하게 하다 |
+| 316 | module recursion<br>모듈 재귀 | Remove circular instantiation<br>순환 인스턴스화 제거 |
+| 317 | recursive instantiation<br>재귀 인스턴스화 | Flatten hierarchy<br>계층구조 평탄화 |
+| 403 | loop limit exceeded<br>루프 제한을 초과했습니다. | Add iteration limit<br>반복 제한 추가 |
 
 ### Category 9: Port Connection Issues
+### 카테고리 9: 포트 연결 문제
 **Pattern**: Instance port connection problems
+**패턴**: 인스턴스 포트 연결 문제
 
-| Oasys ID | Issue | Fix Pattern |
+| Oasys ID<br>오아시스 아이디 | Issue<br>이슈 | Fix Pattern<br>패턴 수정 |
 |----------|-------|-------------|
-| 34 | wrong argument count | Add missing arguments |
-| 349 | wrong connection count | Fix port count |
-| 422 | missing association | Add missing connection |
-| 476 | no matching instance | Fix defparam path |
-| 650 | too many ports | Remove excess |
-| 685 | variable in output port | Change to net or use procedural |
+| 34 | wrong argument count<br>잘못된 인수 개수 | Add missing arguments<br>누락된 인수 추가 |
+| 349 | wrong connection count<br>잘못된 연결 개수 | Fix port count<br>포트 수 수정 |
+| 422 | missing association<br>연관성 누락 | Add missing connection<br>누락된 연결 추가 |
+| 476 | no matching instance<br>일치하는 인스턴스가 없습니다 | Fix defparam path<br>defparam 경로 수정 |
+| 650 | too many ports<br>포트가 너무 많음 | Remove excess<br>초과분 제거 |
+| 685 | variable in output port<br>출력 포트의 변수 | Change to net or use procedural<br>net으로 변경하거나 절차적 사용 |
 
 ### Category 10: Unsupported Constructs
+### 카테고리 10: 지원되지 않는 구성
 **Pattern**: Feature not supported for synthesis
+**패턴**: 합성이 지원되지 않는 기능
 
-| Oasys ID | Issue | Fix Pattern |
+| Oasys ID<br>오아시스 아이디 | Issue<br>이슈 | Fix Pattern<br>패턴 수정 |
 |----------|-------|-------------|
-| 27 | not supported | Use synthesizable alternative |
-| 277 | exponentiation not supported | Use shifts or LUT |
-| 312 | unsynthesizable construct | Replace with supported construct |
-| 589 | case/wildcard equality | Use == or != |
+| 27 | not supported<br>지원되지 않음 | Use synthesizable alternative<br>합성 가능한 대안 사용 |
+| 277 | exponentiation not supported<br>지수화는 지원되지 않습니다. | Use shifts or LUT<br>교대근무 또는 LUT 사용 |
+| 312 | unsynthesizable construct<br>합성할 수 없는 구조물 | Replace with supported construct<br>지원되는 구성으로 바꾸기 |
+| 589 | case/wildcard equality<br>대소문자/와일드카드 동등성 | Use == or !=<br>== 또는 !=를 사용하세요. |
 
 ---
 
 ## Critical Warning Resolution (8 IDs)
+## 심각한 경고 해결(ID 8개)
 
-| ID | Issue | Resolution |
+| ID | Issue<br>이슈 | Resolution<br>해상도 |
 |----|-------|------------|
-| 4442 | BlackBox unconnected pin | Connect pin or document as intentional |
-| 5796 | RAM conflicting writes | Use different addresses or add arbitration |
-| 5967 | Mixed tristate reset | Split vector; separate tristate assignments |
-| 6030 | Inout without tristate | Use explicit direction or tristate buffer |
-| 6781 | Nested interface items | Pass items explicitly; flatten usage |
-| 6790 | Constant reassigned | Remove assignment or change to variable |
-| 6858 | Multi-driven with constant | Remove duplicate drivers |
-| 13329 | Null range | Fix range bounds and direction |
+| 4442 | BlackBox unconnected pin<br>블랙박스 연결되지 않은 핀 | Connect pin or document as intentional<br>의도적으로 핀이나 문서를 연결하세요. |
+| 5796 | RAM conflicting writes<br>RAM 충돌 쓰기 | Use different addresses or add arbitration<br>다른 주소를 사용하거나 중재를 추가하세요. |
+| 5967 | Mixed tristate reset<br>혼합 삼상태 재설정 | Split vector; separate tristate assignments<br>분할 벡터; 별도의 삼국 할당 |
+| 6030 | Inout without tristate<br>삼상태가 없는 Inout | Use explicit direction or tristate buffer<br>명시적 방향 또는 삼상태 버퍼 사용 |
+| 6781 | Nested interface items<br>중첩된 인터페이스 항목 | Pass items explicitly; flatten usage<br>항목을 명시적으로 전달합니다. 사용량을 평탄화하다 |
+| 6790 | Constant reassigned<br>상수 재할당 | Remove assignment or change to variable<br>할당 제거 또는 변수 변경 |
+| 6858 | Multi-driven with constant<br>상수로 다중 구동 | Remove duplicate drivers<br>중복 드라이버 제거 |
+| 13329 | Null range<br>널 범위 | Fix range bounds and direction<br>범위 경계 및 방향 수정 |
 
 ---
 
 ## Complete ID List by Severity
+## 심각도별 전체 ID 목록
 
 ### Critical Warnings (8 IDs)
+### 심각한 경고(ID 8개)
 4442, 5796, 5967, 6030, 6781, 6790, 6858, 13329
 
 ### Errors (457 IDs)
+### 오류(ID 457개)
 
 **27-99**: 27, 34, 35, 36, 78, 83, 91, 99
 
@@ -201,6 +237,7 @@ They provide:
 **12188-13331**: 12188, 12189, 12523, 12526, 13076, 13099, 13162, 13322, 13324, 13331
 
 ### Warnings (86 IDs)
+### 경고(ID 86개)
 
 **85-693**: 85, 90, 98, 151, 153, 264, 290, 302, 308, 311, 312, 324, 327, 330, 445, 506, 547, 567, 589, 613, 614, 689, 693
 
@@ -215,6 +252,7 @@ They provide:
 ---
 
 ## Mandatory Workflow (Per Message)
+## 필수 워크플로(메시지별)
 
 ```
 1. Parse log - extract [Synth 8-XXX] messages (Oasys synthesis)
@@ -230,7 +268,11 @@ They provide:
 ---
 
 ## Reference Files
+## 참조 파일
 
 - **CSV**: `oasys_severity_lists.csv` - Full message catalog (5000+ entries)
+- **CSV**: `oasys_severity_lists.csv` - 전체 메시지 카탈로그(5000개 이상의 항목)
 - **Testcases**: `synth_code_8_xxx_testcase/` - 551 testcase folders with RTL samples
+- **테스트 케이스**: `synth_code_8_xxx_testcase/` - RTL 샘플이 포함된 551개의 테스트 케이스 폴더
 - **Message Handlers**: `message-handlers.md` - Per-ID fix strategies
+- **메시지 핸들러**: `message-handlers.md` - ID별 수정 전략

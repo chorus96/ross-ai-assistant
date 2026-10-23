@@ -1,11 +1,18 @@
+<!-- ko-translation: enabled -->
 # TCL Reference — RTL Elaboration Analysis
+# TCL 참조 - RTL 정교화 분석
 
-Reference TCL blocks for MCP mode workflow. Execute all commands through the
+Reference TCL blocks for MCP mode workflow.
+MCP 모드 워크플로에 대한 참조 TCL 블록입니다.
+Execute all commands through the
+모든 명령을 다음을 통해 실행합니다.
 `vivadoExecute` tool — **never** create `.tcl` script files.
+`vivadoExecute` 도구 — **절대로** `.tcl` 스크립트 파일을 생성하지 마세요.
 
 ---
 
 ## Step 1: Detect Project Mode
+## 1단계: 프로젝트 모드 감지
 
 ```tcl
 set project_path [pwd]
@@ -53,6 +60,7 @@ if {[llength $xpr_files] > 0} {
 ---
 
 ## Step 2: Run RTL Elaboration
+## 2단계: RTL 정교화 실행
 
 ```tcl
 # Create report directory
@@ -77,6 +85,7 @@ puts "synth_design -rtl result: $elab_result"
 ---
 
 ## Step 3: Locate Log File
+## 3단계: 로그 파일 찾기
 
 ```tcl
 # synth_design -rtl writes to vivado.log in cwd (both project and non-project mode)
@@ -91,12 +100,21 @@ puts "Log file: $log_file"
 ---
 
 ## Notes
+## 메모
 
 - `synth_design -rtl` runs only the Verific front-end (parsing + elaboration),
-  skipping synthesis optimization and technology mapping — typically 5-10x faster
+- `synth_design -rtl`은 Verific 프런트엔드(파싱 + 정교화)만 실행합니다.
+skipping synthesis optimization and technology mapping — typically 5-10x faster
+합성 최적화 및 기술 매핑 건너뛰기 - 일반적으로 5~10배 더 빠름
 - Even if elaboration fails (returns error), the log will contain all
-  messages up to the failure point
+- 정교화가 실패하더라도(오류 반환) 로그에는 모든 내용이 포함됩니다.
+messages up to the failure point
+실패 지점까지의 메시지
 - The `catch` wrapper ensures we can still access the log after errors
+- `catch` 래퍼는 오류 후에도 로그에 계속 액세스할 수 있도록 보장합니다.
 - Use `-rtl_skip_ip` for large designs with many OOC IP to speed up further
+- OOC IP가 많은 대규모 설계에는 `-rtl_skip_ip`를 사용하여 속도를 더욱 높이세요.
 - If full synthesis log already exists (e.g., user provides a `runme.log`),
-  the log-file-only workflow is preferred — no need to re-run elaboration
+- 전체 합성 로그가 이미 존재하는 경우(예: 사용자가 'runme.log' 제공)
+the log-file-only workflow is preferred — no need to re-run elaboration
+로그 파일 전용 워크플로가 선호됩니다. 정교화를 다시 실행할 필요가 없습니다.

@@ -1,9 +1,15 @@
+<!-- ko-translation: enabled -->
 <!--
-Copyright (C) 2026, Advanced Micro Devices, Inc. All rights reserved.
+Copyright (C) 2026, Advanced Micro Devices, Inc.
+저작권 (C) 2026, Advanced Micro Devices, Inc.
+All rights reserved.
+모든 권리 보유.
 SPDX-License-Identifier: MIT
+SPDX-라이센스-식별자: MIT
 -->
 
 # RTL Lint Report — Example (Clean Design)
+# RTL 린트 보고서 - 예(클린 디자인)
 
 ```markdown
 # RTL Lint Report

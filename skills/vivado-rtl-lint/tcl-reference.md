@@ -1,16 +1,27 @@
+<!-- ko-translation: enabled -->
 <!--
-Copyright (C) 2026, Advanced Micro Devices, Inc. All rights reserved.
+Copyright (C) 2026, Advanced Micro Devices, Inc.
+저작권 (C) 2026, Advanced Micro Devices, Inc.
+All rights reserved.
+모든 권리 보유.
 SPDX-License-Identifier: MIT
+SPDX-라이센스-식별자: MIT
 -->
 
 # TCL Reference — RTL Lint Skill
+# TCL 참조 - RTL 린트 기술
 
-Reference TCL blocks for each workflow step. Execute all commands through the
+Reference TCL blocks for each workflow step.
+각 워크플로 단계에 대한 TCL 블록을 참조하세요.
+Execute all commands through the
+모든 명령을 다음을 통해 실행합니다.
 `vivadoExecute` tool — **never** create `.tcl` script files.
+`vivadoExecute` 도구 — **절대로** `.tcl` 스크립트 파일을 생성하지 마세요.
 
 ---
 
 ## Step 1: Detect Project Mode
+## 1단계: 프로젝트 모드 감지
 
 ```tcl
 set project_path [pwd]
@@ -100,6 +111,7 @@ if {[llength $xpr_files] > 0} {
 ---
 
 ## Step 2: Create Report Directory
+## 2단계: 보고서 디렉터리 생성
 
 ```tcl
 set report_dir "${project_dir}/vivado_agentic_ai_reports/rtl-lint"
@@ -132,6 +144,7 @@ puts "Report directory: $report_dir"
 ---
 
 ## Step 3: Run RTL Linter
+## 3단계: RTL Linter 실행
 
 ```tcl
 synth_design -top $top_module -part $part_number -lint -file $lint_report_file
@@ -139,6 +152,7 @@ puts "RTL lint analysis complete — Report: $lint_report_file"
 ```
 
 ### Verify report was created
+### 보고서가 생성되었는지 확인
 
 ```tcl
 if {![file exists $lint_report_file]} {
@@ -154,10 +168,14 @@ puts "Verification passed: $lint_report_file created ([expr {$file_size / 1024.0
 ---
 
 ## Step 4: Parse Report to CSV
+## 4단계: 보고서를 CSV로 구문 분석
 
 For Vivado ≥ 26.1, `$lint_report_file` is already a headerless CSV (`linter.csv`).
+Vivado ≥ 26.1의 경우 `$lint_report_file`은 이미 헤더 없는 CSV(`linter.csv`)입니다.
 For older versions, run [parse_lint_report.py](parse_lint_report.py) to convert the
+이전 버전의 경우 [parse_lint_report.py](parse_lint_report.py)를 실행하여
 `.rpt` file into the same CSV format.
+`.rpt` 파일을 동일한 CSV 형식으로 변환합니다.
 
 ```tcl
 if {$lint_csv_format} {
