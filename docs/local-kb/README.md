@@ -1,4 +1,5 @@
 <!-- ko-translation: enabled -->
+
 <!--
 Copyright (C) 2026, Advanced Micro Devices, Inc.
 저작권 (C) 2026, Advanced Micro Devices, Inc.
@@ -9,38 +10,6 @@ SPDX-라이센스-식별자: MIT
 -->
 
 # AMD Embedded — Locally Deployable RAG Database
-# AMD 임베디드 — 로컬로 배포 가능한 RAG 데이터베이스
-
-**A fully air-gapped, self-hosted Retrieval-Augmented Generation (RAG)
-**완전히 에어갭이 있는 자체 호스팅 RAG(Retrieval-Augmented Generation)
-database for AMD Embedded documentation — the retrieval layer only, with no
-AMD Embedded 문서용 데이터베이스 — 검색 계층만 해당, 없음
-outbound network calls at runtime.**
-런타임 시 아웃바운드 네트워크 호출.**
-
-This document covers everything that is **common regardless of which model
-이 문서는 **모델에 관계없이 일반적인 모든 내용을 다룹니다.
-answers your questions afterward** — a local LLM on GPU-class hardware, or
-나중에 질문에 답변** - GPU급 하드웨어의 로컬 LLM 또는
-a frontier cloud model like GitHub Copilot.
-GitHub Copilot과 같은 프론티어 클라우드 모델입니다.
-That choice is covered in the
-그 선택은 다음에서 다룹니다.
-two companion documents linked below; this one is only about the RAG
-아래에 링크된 두 개의 동반 문서; 이건 단지 RAG에 관한 것뿐이야
-database itself: why it exists, how it works, and how to deploy it.
-데이터베이스 자체: 존재 이유, 작동 방식 및 배포 방법
-
-The documentation corpus covers the full range of content published by the
-문서 자료는 다음에서 게시한 모든 범위의 콘텐츠를 다루고 있습니다.
-AMD Embedded team — not just Vivado.
-AMD 임베디드 팀 — Vivado만이 아닙니다.
-This includes **Vivado**, **Vitis**,
-여기에는 **Vivado**, **Vitis**,
-**Power Design Manager (PDM)**, **ChipScope**, **System Software**,
-**전력 설계 관리자(PDM)**, **ChipScope**, **시스템 소프트웨어**,
-**example designs**, **Wiki** pages, and **Answer Records**.
-**디자인 예**, **Wiki** 페이지 및 **답변 기록**.
 
 > **Where this page sits in the guide**
 > **가이드에서 이 페이지가 있는 위치**
@@ -54,7 +23,7 @@ This includes **Vivado**, **Vitis**,
 >
 > - [Quick Start](quickstart.md) — stand the stack up on a connected machine
 > - [빠른 시작](quickstart.md) — 연결된 시스템에 스택을 세웁니다.
-> - [Operate & Troubleshoot](operate.md) — CLI reference, validation, and fixes
+> - [Operate &amp; Troubleshoot](operate.md) — CLI reference, validation, and fixes
 > - [운영 및 문제 해결](operate.md) — CLI 참조, 검증 및 수정 사항
 > - [Frontier Model](frontier-model.md) — answer with a cloud model (no local GPU)
 > - [프론티어 모델](frontier-model.md) — 클라우드 모델로 답변(로컬 GPU 없음)
@@ -64,10 +33,13 @@ This includes **Vivado**, **Vitis**,
 ---
 
 ## 1.
+
 ## Overview
+
 ## 개요
 
 ### 1.1 The Problem
+
 ### 1.1 문제
 
 Engineers ask their AI assistant (VS Code, OpenCode, etc.) questions like
@@ -112,6 +84,7 @@ The database that makes this possible runs
 > [§1.4](#14-응답 모델).
 
 ### 1.2 Key Concepts
+
 ### 1.2 주요 개념
 
 <details>
@@ -242,14 +215,14 @@ jobs** — and only one of them ("the LLM") is the one you get to choose
 between local and frontier.
 지역과 국경 사이.
 
-| | Embedding model (e.g. EmbeddingGemma, Qwen3-Embedding)<br>임베딩 모델(예: EmbeddingGemma, Qwen3-Embedding) | The LLM that answers you (local *or* frontier)<br>귀하에게 응답하는 LLM(지역 *또는* 국경) |
-|---|---|---|
-| **Job**<br>**직업** | Turns text into a vector of numbers<br>텍스트를 숫자 벡터로 변환합니다. | Reads text and generates new text<br>텍스트를 읽고 새 텍스트를 생성합니다. |
-| **Output**<br>**출력** | A list of ~hundreds of numbers — not human-readable<br>사람이 읽을 수 없는 ~수백 개의 숫자 목록 | A conversational, human-readable answer<br>사람이 읽을 수 있는 대화식 답변 |
-| **Size**<br>**크기** | Small (300M-600M parameters, a few hundred MB to ~1.2 GB)<br>작음(300M~600M 매개변수, 수백 MB~~1.2GB) | Varies — tens of GB if local, unknown/irrelevant if a cloud frontier model<br>다양함 - 로컬인 경우 수십 GB, 클라우드 프론티어 모델인 경우 알 수 없음/관련 없음 |
-| **Can it chat or reason?**<br>**채팅이나 추론이 가능합니까?** | No — it has no notion of a "conversation," it only measures similarity of meaning<br>아니요. "대화"라는 개념이 없으며 의미의 유사성만 측정합니다. | Yes — this is what actually writes the answer you read<br>예 — 이것이 실제로 읽은 답변을 쓰는 것입니다 |
-| **Can it search millions of documents fast?**<br>**수백만 개의 문서를 빠르게 검색할 수 있나요?** | Yes — that's its entire purpose<br>예 - 그게 전부 목적이에요 | Not practically — far too slow/expensive to compare raw text this way<br>실제로는 그렇지 않습니다. 이런 식으로 원시 텍스트를 비교하기에는 너무 느리거나 비용이 많이 듭니다. |
-| **Where it runs**<br>**실행 위치** | Always local — inside the Docker stack (§2.2)<br>항상 로컬 - Docker 스택 내부(§2.2) | Your choice — see [§1.4](#14-answering-model)<br>귀하의 선택 - [§1.4](#14-응답 모델) 참조 |
+|                                                                                                    | Embedding model (e.g. EmbeddingGemma, Qwen3-Embedding)임베딩 모델(예: EmbeddingGemma, Qwen3-Embedding)                                         | The LLM that answers you (local *or* frontier)귀하에게 응답하는 LLM(지역 *또는* 국경)                                                                                |
+| -------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Job****직업**                                                                              | Turns text into a vector of numbers텍스트를 숫자 벡터로 변환합니다.                                                                            | Reads text and generates new text텍스트를 읽고 새 텍스트를 생성합니다.                                                                                                   |
+| **Output****출력**                                                                           | A list of ~hundreds of numbers — not human-readable사람이 읽을 수 없는 ~수백 개의 숫자 목록                                                   | A conversational, human-readable answer사람이 읽을 수 있는 대화식 답변                                                                                                   |
+| **Size****크기**                                                                             | Small (300M-600M parameters, a few hundred MB to ~1.2 GB)작음(300M~600M 매개변수, 수백 MB~~1.2GB)                                              | Varies — tens of GB if local, unknown/irrelevant if a cloud frontier model다양함 - 로컬인 경우 수십 GB, 클라우드 프론티어 모델인 경우 알 수 없음/관련 없음              |
+| **Can it chat or reason?****채팅이나 추론이 가능합니까?**                                    | No — it has no notion of a "conversation," it only measures similarity of meaning아니요. "대화"라는 개념이 없으며 의미의 유사성만 측정합니다. | Yes — this is what actually writes the answer you read예 — 이것이 실제로 읽은 답변을 쓰는 것입니다                                                                     |
+| **Can it search millions of documents fast?****수백만 개의 문서를 빠르게 검색할 수 있나요?** | Yes — that's its entire purpose예 - 그게 전부 목적이에요                                                                                      | Not practically — far too slow/expensive to compare raw text this way실제로는 그렇지 않습니다. 이런 식으로 원시 텍스트를 비교하기에는 너무 느리거나 비용이 많이 듭니다. |
+| **Where it runs****실행 위치**                                                               | Always local — inside the Docker stack (§2.2)항상 로컬 - Docker 스택 내부(§2.2)                                                             | Your choice — see [§1.4](#14-answering-model)귀하의 선택 - [§1.4](#14-응답 모델) 참조                                                                                  |
 
 In short: the **embedding model is the librarian's index card system** — it
 간단히 말해서 **임베딩 모델은 사서의 색인 카드 시스템**입니다.
@@ -296,6 +269,7 @@ client/model combination can use it, local or cloud.
 </details>
 
 ### 1.3 Worked Example
+
 ### 1.3 실제 사례
 
 Suppose you ask: *"Why does Vivado report a hold-time violation on a
@@ -309,47 +283,47 @@ Step by step, that diagram is:
 단계별로 해당 다이어그램은 다음과 같습니다.
 
 1. Your AI client (VS Code Agent mode or OpenCode) sends the question to
-1. AI 클라이언트(VS Code Agent 모드 또는 OpenCode)가 질문을 보냅니다.
-the LLM you've configured — local or frontier, it makes no difference
-귀하가 구성한 LLM — 지역이든 변경 지역이든 상관없습니다.
-to the steps that follow.
-다음 단계로 이동하세요.
-The LLM recognizes it doesn't have enough
-LLM은 충분하지 않다는 것을 인식합니다.
-specific information, and calls the `vivado_doc_search` tool over MCP —
-특정 정보를 제공하고 MCP를 통해 `vivado_doc_search` 도구를 호출합니다.
-instead of guessing.
-추측하는 대신.
-2. The MCP server forwards your question text to Weaviate.
-2. MCP 서버는 귀하의 질문 텍스트를 Weaviate로 전달합니다.
-2. Weaviate's
-2. 위비에이트의
-configured vectorizer sends the query to the local llama.cpp embedding
-구성된 벡터화 도구는 쿼리를 로컬 llama.cpp 임베딩으로 보냅니다.
-service, which converts it into a vector.
-이를 벡터로 변환하는 서비스입니다.
-Weaviate then performs a
-Weaviate는 다음을 수행합니다.
-hybrid search — keyword and vector similarity — against the
-하이브리드 검색(키워드 및 벡터 유사성)
-pre-computed vectors already stored in its database.
-사전 계산된 벡터는 이미 데이터베이스에 저장되어 있습니다.
-The corpus was
-말뭉치는
-built from AMD Embedded's Vivado, Vitis, PDM, ChipScope, System
-AMD Embedded의 Vivado, Vitis, PDM, ChipScope, 시스템으로 구축
-Software, example designs, Wiki, and Answer Records content.
-소프트웨어, 예제 디자인, Wiki 및 Answer Records 콘텐츠.
-3. The matching documentation passages are returned through the MCP server
-3. 일치하는 문서 구절이 MCP 서버를 통해 반환됩니다.
-back to the LLM.
-LLM으로 돌아갑니다.
-4. The LLM reads those passages and writes a final answer, grounded in —
-4. LLM은 해당 구절을 읽고 다음에 근거하여 최종 답변을 작성합니다.
-and typically citing — the actual documentation, instead of relying on
-일반적으로 인용 — 의존하는 대신 실제 문서
-whatever it vaguely remembers from training.
-훈련에서 막연하게 기억하는 것은 무엇이든.
+2. AI 클라이언트(VS Code Agent 모드 또는 OpenCode)가 질문을 보냅니다.
+   the LLM you've configured — local or frontier, it makes no difference
+   귀하가 구성한 LLM — 지역이든 변경 지역이든 상관없습니다.
+   to the steps that follow.
+   다음 단계로 이동하세요.
+   The LLM recognizes it doesn't have enough
+   LLM은 충분하지 않다는 것을 인식합니다.
+   specific information, and calls the `vivado_doc_search` tool over MCP —
+   특정 정보를 제공하고 MCP를 통해 `vivado_doc_search` 도구를 호출합니다.
+   instead of guessing.
+   추측하는 대신.
+3. The MCP server forwards your question text to Weaviate.
+4. MCP 서버는 귀하의 질문 텍스트를 Weaviate로 전달합니다.
+5. Weaviate's
+6. 위비에이트의
+   configured vectorizer sends the query to the local llama.cpp embedding
+   구성된 벡터화 도구는 쿼리를 로컬 llama.cpp 임베딩으로 보냅니다.
+   service, which converts it into a vector.
+   이를 벡터로 변환하는 서비스입니다.
+   Weaviate then performs a
+   Weaviate는 다음을 수행합니다.
+   hybrid search — keyword and vector similarity — against the
+   하이브리드 검색(키워드 및 벡터 유사성)
+   pre-computed vectors already stored in its database.
+   사전 계산된 벡터는 이미 데이터베이스에 저장되어 있습니다.
+   The corpus was
+   말뭉치는
+   built from AMD Embedded's Vivado, Vitis, PDM, ChipScope, System
+   AMD Embedded의 Vivado, Vitis, PDM, ChipScope, 시스템으로 구축
+   Software, example designs, Wiki, and Answer Records content.
+   소프트웨어, 예제 디자인, Wiki 및 Answer Records 콘텐츠.
+7. The matching documentation passages are returned through the MCP server
+8. 일치하는 문서 구절이 MCP 서버를 통해 반환됩니다.
+   back to the LLM.
+   LLM으로 돌아갑니다.
+9. The LLM reads those passages and writes a final answer, grounded in —
+10. LLM은 해당 구절을 읽고 다음에 근거하여 최종 답변을 작성합니다.
+    and typically citing — the actual documentation, instead of relying on
+    일반적으로 인용 — 의존하는 대신 실제 문서
+    whatever it vaguely remembers from training.
+    훈련에서 막연하게 기억하는 것은 무엇이든.
 
 The retrieval step itself (step 2: vectorize → hybrid search → return
 검색 단계 자체(2단계: 벡터화 → 하이브리드 검색 → 반환)
@@ -367,6 +341,7 @@ answer — see the [Frontier Model](frontier-model.md) or
 [로컬 LLM](local-llm.md) 그림의 절반에 대한 안내입니다.
 
 ### 1.4 Answering Model
+
 ### 1.4 응답 모델
 
 Everything above — vector database, embedding model, and MCP server — always
@@ -385,14 +360,15 @@ RAG 데이터베이스(아래 배포)는 두 옵션 모두 동일합니다.
 answering model differs:
 응답 모델이 다릅니다.
 
-| | **[Frontier model](frontier-model.md)** (Option A)<br>**[프론티어 모델](frontier-model.md)** (옵션 A) | **[Local LLM](local-llm.md)** (Option B)<br>**[로컬 LLM](local-llm.md)** (옵션 B) |
-|---|---|---|
-| Answering LLM runs<br>LLM 실행 응답 | Cloud (e.g. GitHub Copilot in VS Code)<br>클라우드(예: VS Code의 GitHub Copilot) | On your machine (`llama-server`)<br>귀하의 컴퓨터에서(`llama-server`) |
-| Hardware<br>하드웨어 | Any laptop — **no local GPU**<br>모든 노트북 — **로컬 GPU 없음** | GPU-class (ROCm or Vulkan capable; this guide is written and tested for **AMD ROCm**)<br>GPU 클래스(ROCm 또는 Vulkan 지원, 이 가이드는 **AMD ROCm**에 대해 작성 및 테스트되었습니다.) |
-| End-to-end air-gapped?<br>종단 간 에어 갭? | **No** — the question + retrieved passages go to the cloud model<br>**아니요** — 질문 + 검색된 구절이 클라우드 모델로 이동합니다. | **Yes** — zero outbound network<br>**예** — 아웃바운드 네트워크 없음 |
-| Choose when<br>언제 선택하세요 | Fastest start, or no local GPU<br>가장 빠른 시작 또는 로컬 GPU 없음 | Full air-gap is required<br>완전한 에어갭이 필요합니다. |
+|                                        | **[Frontier model](frontier-model.md)** (Option A)**[프론티어 모델](frontier-model.md)** (옵션 A)                                 | **[Local LLM](local-llm.md)** (Option B)**[로컬 LLM](local-llm.md)** (옵션 B)                                                                                                       |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Answering LLM runsLLM 실행 응답        | Cloud (e.g. GitHub Copilot in VS Code)클라우드(예: VS Code의 GitHub Copilot)                                                                | On your machine (`llama-server`)귀하의 컴퓨터에서(`llama-server`)                                                                                                                         |
+| Hardware하드웨어                       | Any laptop — **no local GPU**모든 노트북 — **로컬 GPU 없음**                                                                  | GPU-class (ROCm or Vulkan capable; this guide is written and tested for **AMD ROCm**)GPU 클래스(ROCm 또는 Vulkan 지원, 이 가이드는 **AMD ROCm**에 대해 작성 및 테스트되었습니다.) |
+| End-to-end air-gapped?종단 간 에어 갭? | **No** — the question + retrieved passages go to the cloud model**아니요** — 질문 + 검색된 구절이 클라우드 모델로 이동합니다. | **Yes** — zero outbound network**예** — 아웃바운드 네트워크 없음                                                                                                                |
+| Choose when언제 선택하세요             | Fastest start, or no local GPU가장 빠른 시작 또는 로컬 GPU 없음                                                                             | Full air-gap is required완전한 에어갭이 필요합니다.                                                                                                                                           |
 
 ### 1.5 Embedding Packages
+
 ### 1.5 패키지 삽입
 
 This solution is delivered as a self-contained package **per embedding
@@ -425,11 +401,11 @@ Until then, if you get to choose, decide on **license** or
 **download size** — otherwise use the one supplied to you.
 **다운로드 크기** — 그렇지 않으면 제공된 크기를 사용하세요.
 
-| | `embeddinggemma-300m`<br>`임베딩젬마-300m` | `qwen3-embedding-0.6b`<br>`qwen3-임베딩-0.6b` |
-|---|---|---|
-| Embedding model<br>임베딩 모델 | Google EmbeddingGemma-300M (Q8_0)<br>Google EmbeddingGemma-300M(Q8_0) | Qwen3-Embedding-0.6B (f16)<br>Qwen3-임베딩-0.6B(f16) |
-| License<br>라이센스 | Gemma Terms of Use<br>젬마 이용약관 | Apache 2.0<br>아파치 2.0 |
-| Download size<br>다운로드 크기 | ~3.1 GB | ~4.4 GB |
+|                            | `embeddinggemma-300m임베딩젬마-300m`                            | `qwen3-embedding-0.6bqwen3-임베딩-0.6b`        |
+| -------------------------- | ----------------------------------------------------------------- | ------------------------------------------------ |
+| Embedding model임베딩 모델 | Google EmbeddingGemma-300M (Q8_0)Google EmbeddingGemma-300M(Q8_0) | Qwen3-Embedding-0.6B (f16)Qwen3-임베딩-0.6B(f16) |
+| License라이센스            | Gemma Terms of Use젬마 이용약관                                   | Apache 2.0아파치 2.0                             |
+| Download size다운로드 크기 | ~3.1 GB                                                           | ~4.4 GB                                          |
 
 For **setup**, the two are interchangeable — the same commands and file
 **설정**의 경우 두 가지가 서로 호환됩니다. 동일한 명령과 파일
@@ -443,10 +419,13 @@ differ (see [§2.4](#24-file-layout) and
 ---
 
 ## 2.
+
 ## Architecture
+
 ## 건축
 
 ### 2.1 Docker Basics
+
 ### 2.1 도커 기본
 
 Before looking at the stack itself, it helps to clear up a common point of
@@ -460,36 +439,36 @@ containers at the same time, each fully isolated from the others.
 
 - A **container** is a lightweight, self-contained package: an application
 - **컨테이너**는 경량의 독립형 패키지입니다.
-plus everything it needs to run (libraries, configuration, dependencies) —
-그리고 실행에 필요한 모든 것(라이브러리, 구성, 종속성) —
-but *not* a full operating system.
-그러나 완전한 운영 체제는 *아닙니다*.
-Think of it like a shipping container
-컨테이너라고 생각하시면 됩니다
-(where Docker gets its name and logo): a standardized box that can be
-(Docker의 이름과 로고가 표시됨): 표준화된 상자입니다.
-built once, moved anywhere, and run the same way regardless of what's
-한 번 구축하고, 어디로든 이동하고, 무엇이든지 동일한 방식으로 실행됩니다.
-inside or what machine it's placed on.
-내부 또는 어떤 기계에 배치되어 있는지.
+  plus everything it needs to run (libraries, configuration, dependencies) —
+  그리고 실행에 필요한 모든 것(라이브러리, 구성, 종속성) —
+  but *not* a full operating system.
+  그러나 완전한 운영 체제는 *아닙니다*.
+  Think of it like a shipping container
+  컨테이너라고 생각하시면 됩니다
+  (where Docker gets its name and logo): a standardized box that can be
+  (Docker의 이름과 로고가 표시됨): 표준화된 상자입니다.
+  built once, moved anywhere, and run the same way regardless of what's
+  한 번 구축하고, 어디로든 이동하고, 무엇이든지 동일한 방식으로 실행됩니다.
+  inside or what machine it's placed on.
+  내부 또는 어떤 기계에 배치되어 있는지.
 - **Docker** (or more precisely the *Docker Engine*) is the software
 - **Docker**(또는 더 정확하게는 *Docker Engine*)는 소프트웨어입니다.
-installed on your machine that knows how to build, start, stop, and
-빌드하고, 시작하고, 중지하고, 수행하는 방법을 아는 컴퓨터에 설치됩니다.
-isolate these containers.
-이 용기를 격리하십시오.
+  installed on your machine that knows how to build, start, stop, and
+  빌드하고, 시작하고, 중지하고, 수행하는 방법을 아는 컴퓨터에 설치됩니다.
+  isolate these containers.
+  이 용기를 격리하십시오.
 - **Docker Compose** is a tool for describing a *group* of related
 - **Docker Compose**는 관련 *그룹*을 설명하는 도구입니다.
-containers — which images to run, how they're networked together, which
-컨테이너 - 실행할 이미지, 네트워크 연결 방식,
-ports they expose — in a single file (`docker-compose.yml`), and starting
-노출되는 포트 — 단일 파일(`docker-compose.yml`)에서 시작
-or stopping all of them together with one command.
-또는 하나의 명령으로 모두 함께 중지할 수 있습니다.
-A group of containers
-컨테이너 그룹
-managed this way is often called a **stack** or **project**.
-이런 방식으로 관리되는 것을 **스택** 또는 **프로젝트**라고 합니다.
+  containers — which images to run, how they're networked together, which
+  컨테이너 - 실행할 이미지, 네트워크 연결 방식,
+  ports they expose — in a single file (`docker-compose.yml`), and starting
+  노출되는 포트 — 단일 파일(`docker-compose.yml`)에서 시작
+  or stopping all of them together with one command.
+  또는 하나의 명령으로 모두 함께 중지할 수 있습니다.
+  A group of containers
+  컨테이너 그룹
+  managed this way is often called a **stack** or **project**.
+  이런 방식으로 관리되는 것을 **스택** 또는 **프로젝트**라고 합니다.
 
 A single Docker installation can absolutely run multiple containers side by
 단일 Docker 설치로 여러 컨테이너를 동시에 실행할 수 있습니다.
@@ -507,19 +486,20 @@ replaceable and independently restartable if one of them needs attention.
 주의가 필요한 경우 교체 가능하고 독립적으로 다시 시작할 수 있습니다.
 
 ### 2.2 Docker Stack
+
 ### 2.2 도커 스택
 
 ![Diagram: the MCP server sends searches to Weaviate; Weaviate requests query embeddings from llama.cpp and performs hybrid search.
-![다이어그램: MCP 서버는 Weaviate로 검색을 보냅니다. Weaviate는 llama.cpp에서 쿼리 임베딩을 요청하고 하이브리드 검색을 수행합니다.
-A one-time importer loads the snapshot into Weaviate on first start.](diagrams/docker-stack.svg)
+다이어그램: MCP 서버는 Weaviate로 검색을 보냅니다. Weaviate는 llama.cpp에서 쿼리 임베딩을 요청하고 하이브리드 검색을 수행합니다.
+A one-time importer loads the snapshot into Weaviate on first start.
 일회성 임포터는 처음 시작할 때 Weaviate에 스냅샷을 로드합니다.](diagrams/docker-stack.svg)
 
-| Container<br>컨테이너 | Image<br>이미지 | Role<br>역할 |
-|-----------|-------|------|
-| **Weaviate**<br>**Weaviate** | `cr.weaviate.io/semitechnologies/weaviate:1.38.2`<br>`cr.weaviate.io/semitechnologies/weaviate:1.38.2` | Vector database and query orchestrator. Its `text2vec-openai` vectorizer calls llama.cpp for query embeddings, then Weaviate performs hybrid keyword/vector search over the imported corpus.<br>벡터 데이터베이스 및 쿼리 조정자. 'text2vec-openai' 벡터화 도구는 쿼리 임베딩을 위해 llama.cpp를 호출한 다음 Weaviate는 가져온 코퍼스에 대해 하이브리드 키워드/벡터 검색을 수행합니다. |
-| **llama.cpp**<br>**라마.cpp** | `ghcr.io/ggml-org/llama.cpp:server`<br>`ghcr.io/ggml-org/llama.cpp:서버` | Long-running embedding service. Loads EmbeddingGemma-300M or Qwen3-Embedding-0.6B at startup and converts query text to vectors through `/v1/embeddings`. Small footprint (a few hundred MB to ~1.2 GB model, CPU-only by default).<br>장기 실행 임베딩 서비스. 시작 시 EmbeddingGemma-300M 또는 Qwen3-Embedding-0.6B를 로드하고 `/v1/embeddings`를 통해 쿼리 텍스트를 벡터로 변환합니다. 작은 설치 공간(수백 MB ~ 1.2GB 모델, 기본적으로 CPU 전용). |
-| **MCP Server**<br>**MCP 서버** | `vivado.amd.com/doc-search-mcp-server:0.9.0`<br>`vivado.amd.com/doc-search-mcp-server:0.9.0` | Exposes the `vivado_doc_search` tool over MCP HTTP transport (named `vivado_doc_search` for client compatibility, but it searches the entire AMD Embedded corpus, not Vivado alone). It sends search requests to Weaviate and returns its results.<br>MCP HTTP 전송을 통해 `vivado_doc_search` 도구를 노출합니다(클라이언트 호환성을 위해 `vivado_doc_search`로 명명되었지만 Vivado 단독이 아닌 전체 AMD 임베디드 코퍼스를 검색합니다). Weaviate에 검색 요청을 보내고 결과를 반환합니다. |
-| **Snapshot importer** *(first start only)*<br>**스냅샷 가져오기** *(처음 시작만 해당)* | snapshot image bundled in the package<br>패키지에 번들로 포함된 스냅샷 이미지 | One-shot job container. Waits for Weaviate, creates/configures the collection, and loads the pre-vectorized documentation snapshot. It exits after successful import. The image tag follows that package build.<br>원샷 작업 컨테이너. Weaviate를 기다리고, 컬렉션을 생성/구성하고, 사전 벡터화된 문서 스냅샷을 로드합니다. 가져오기 성공 후 종료됩니다. 이미지 태그는 해당 패키지 빌드를 따릅니다. |
+| Container컨테이너                                                                                | Image이미지                                                                                        | Role역할                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Weaviate****Weaviate**                                                                   | `cr.weaviate.io/semitechnologies/weaviate:1.38.2cr.weaviate.io/semitechnologies/weaviate:1.38.2` | Vector database and query orchestrator. Its `text2vec-openai` vectorizer calls llama.cpp for query embeddings, then Weaviate performs hybrid keyword/vector search over the imported corpus.벡터 데이터베이스 및 쿼리 조정자. 'text2vec-openai' 벡터화 도구는 쿼리 임베딩을 위해 llama.cpp를 호출한 다음 Weaviate는 가져온 코퍼스에 대해 하이브리드 키워드/벡터 검색을 수행합니다.                                                                                                         |
+| **llama.cpp****라마.cpp**                                                                  | `ghcr.io/ggml-org/llama.cpp:serverghcr.io/ggml-org/llama.cpp:서버`                               | Long-running embedding service. Loads EmbeddingGemma-300M or Qwen3-Embedding-0.6B at startup and converts query text to vectors through `/v1/embeddings`. Small footprint (a few hundred MB to ~1.2 GB model, CPU-only by default).장기 실행 임베딩 서비스. 시작 시 EmbeddingGemma-300M 또는 Qwen3-Embedding-0.6B를 로드하고 `/v1/embeddings`를 통해 쿼리 텍스트를 벡터로 변환합니다. 작은 설치 공간(수백 MB ~ 1.2GB 모델, 기본적으로 CPU 전용).                                         |
+| **MCP Server****MCP 서버**                                                                 | `vivado.amd.com/doc-search-mcp-server:0.9.0vivado.amd.com/doc-search-mcp-server:0.9.0`           | Exposes the `vivado_doc_search` tool over MCP HTTP transport (named `vivado_doc_search` for client compatibility, but it searches the entire AMD Embedded corpus, not Vivado alone). It sends search requests to Weaviate and returns its results.MCP HTTP 전송을 통해 `vivado_doc_search` 도구를 노출합니다(클라이언트 호환성을 위해 `vivado_doc_search`로 명명되었지만 Vivado 단독이 아닌 전체 AMD 임베디드 코퍼스를 검색합니다). Weaviate에 검색 요청을 보내고 결과를 반환합니다. |
+| **Snapshot importer** *(first start only)***스냅샷 가져오기** *(처음 시작만 해당)* | snapshot image bundled in the package패키지에 번들로 포함된 스냅샷 이미지                          | One-shot job container. Waits for Weaviate, creates/configures the collection, and loads the pre-vectorized documentation snapshot. It exits after successful import. The image tag follows that package build.원샷 작업 컨테이너. Weaviate를 기다리고, 컬렉션을 생성/구성하고, 사전 벡터화된 문서 스냅샷을 로드합니다. 가져오기 성공 후 종료됩니다. 이미지 태그는 해당 패키지 빌드를 따릅니다.                                                                                              |
 
 None of these containers is an answering LLM — this stack is **retrieval
 이러한 컨테이너 중 어느 것도 응답 LLM이 아닙니다. 이 스택은 **검색입니다.
@@ -535,64 +515,65 @@ lives outside this stack entirely (see [§1.4](#14-answering-model)).
 이 스택 외부에 완전히 존재합니다([§1.4](#14-응답 모델) 참조).
 
 ### 2.3 Components
+
 ### 2.3 구성요소
 
 - **Embedding model**: one of two self-hosted options depending on the
 - **임베딩 모델**: 두 가지 자체 호스팅 옵션 중 하나
-package you were supplied (see [§1.5](#15-embedding-packages)):
-제공된 패키지([§1.5](#15-embedding-packages) 참조):
-Google EmbeddingGemma-300M, quantized to Q8_0 (GGUF),
-Google EmbeddingGemma-300M, Q8_0(GGUF)으로 양자화,
-`models/embeddinggemma-300M-Q8_0.gguf` (~330 MB); or Qwen3-Embedding-0.6B,
-`models/embeddinggemma-300M-Q8_0.gguf` (~330MB); 또는 Qwen3-Embedding-0.6B,
-f16 (GGUF), `models/Qwen3-Embedding-0.6B-f16.gguf` (~1.2 GB).
-f16(GGUF), `models/Qwen3-Embedding-0.6B-f16.gguf`(~1.2GB).
-Either
-둘 중 하나
-converts natural-language queries into vectors for similarity search.
-유사성 검색을 위해 자연어 쿼리를 벡터로 변환합니다.
-Runs via llama.cpp's built-in HTTP server — no Python, no GPU required.
-llama.cpp의 내장 HTTP 서버를 통해 실행됩니다. Python이나 GPU가 필요하지 않습니다.
+  package you were supplied (see [§1.5](#15-embedding-packages)):
+  제공된 패키지([§1.5](#15-embedding-packages) 참조):
+  Google EmbeddingGemma-300M, quantized to Q8_0 (GGUF),
+  Google EmbeddingGemma-300M, Q8_0(GGUF)으로 양자화,
+  `models/embeddinggemma-300M-Q8_0.gguf` (~330 MB); or Qwen3-Embedding-0.6B,
+  `models/embeddinggemma-300M-Q8_0.gguf` (~330MB); 또는 Qwen3-Embedding-0.6B,
+  f16 (GGUF), `models/Qwen3-Embedding-0.6B-f16.gguf` (~1.2 GB).
+  f16(GGUF), `models/Qwen3-Embedding-0.6B-f16.gguf`(~1.2GB).
+  Either
+  둘 중 하나
+  converts natural-language queries into vectors for similarity search.
+  유사성 검색을 위해 자연어 쿼리를 벡터로 변환합니다.
+  Runs via llama.cpp's built-in HTTP server — no Python, no GPU required.
+  llama.cpp의 내장 HTTP 서버를 통해 실행됩니다. Python이나 GPU가 필요하지 않습니다.
 - **Documentation database**: Weaviate, loaded with a curated,
 - **문서 데이터베이스**: 선별된 내용이 포함된 Weaviate
-pre-vectorized snapshot of the **full AMD Embedded documentation set**:
-**전체 AMD 임베디드 문서 세트**의 사전 벡터화된 스냅샷:
-Vivado, Vitis, Power Design Manager, ChipScope, System Software, example
-Vivado, Vitis, Power Design Manager, ChipScope, 시스템 소프트웨어, 예
-designs, Wiki pages, and Answer Records — shipped as a Weaviate snapshot
-디자인, Wiki 페이지 및 답변 기록 — Weaviate 스냅샷으로 제공
-and imported automatically on first `amd-embedded-doc-search start`.
-첫 번째 `amd-embedded-doc-search start` 시 자동으로 가져옵니다.
-During queries,
-쿼리하는 동안,
-Weaviate calls the configured local llama.cpp embedding endpoint and then
-Weaviate는 구성된 로컬 llama.cpp 임베딩 엔드포인트를 호출한 다음
-performs hybrid keyword/vector search.
-하이브리드 키워드/벡터 검색을 수행합니다.
+  pre-vectorized snapshot of the **full AMD Embedded documentation set**:
+  **전체 AMD 임베디드 문서 세트**의 사전 벡터화된 스냅샷:
+  Vivado, Vitis, Power Design Manager, ChipScope, System Software, example
+  Vivado, Vitis, Power Design Manager, ChipScope, 시스템 소프트웨어, 예
+  designs, Wiki pages, and Answer Records — shipped as a Weaviate snapshot
+  디자인, Wiki 페이지 및 답변 기록 — Weaviate 스냅샷으로 제공
+  and imported automatically on first `amd-embedded-doc-search start`.
+  첫 번째 `amd-embedded-doc-search start` 시 자동으로 가져옵니다.
+  During queries,
+  쿼리하는 동안,
+  Weaviate calls the configured local llama.cpp embedding endpoint and then
+  Weaviate는 구성된 로컬 llama.cpp 임베딩 엔드포인트를 호출한 다음
+  performs hybrid keyword/vector search.
+  하이브리드 키워드/벡터 검색을 수행합니다.
 - **MCP server**: exposes `vivado_doc_search` at
 - **MCP 서버**: 'vivado_doc_search'를 다음 위치에 노출합니다.
-`http://127.0.0.1:<port>/mcp/doc-search` over the Model Context Protocol —
-Model Context Protocol을 통한 `http://127.0.0.1:<port>/mcp/doc-search` —
-usable by any MCP-compatible client (VS Code Agent mode, OpenCode, etc.),
-모든 MCP 호환 클라이언트(VS Code Agent 모드, OpenCode 등)에서 사용할 수 있습니다.
-whichever model that client is talking to.
-그 클라이언트가 어떤 모델과 대화하고 있든 상관없습니다.
-It contacts Weaviate, not the
-Weaviate에 연결되지만
-embedding service directly.
-직접 임베딩 서비스를 제공합니다.
+  `http://127.0.0.1:<port>/mcp/doc-search` over the Model Context Protocol —
+  Model Context Protocol을 통한 `http://127.0.0.1:<port>/mcp/doc-search` —
+  usable by any MCP-compatible client (VS Code Agent mode, OpenCode, etc.),
+  모든 MCP 호환 클라이언트(VS Code Agent 모드, OpenCode 등)에서 사용할 수 있습니다.
+  whichever model that client is talking to.
+  그 클라이언트가 어떤 모델과 대화하고 있든 상관없습니다.
+  It contacts Weaviate, not the
+  Weaviate에 연결되지만
+  embedding service directly.
+  직접 임베딩 서비스를 제공합니다.
 - **The answering LLM** (external to this stack, by design): this stack
 - **응답 LLM**(설계상 이 스택 외부): 이 스택
-provides **retrieval only** — you supply a separate model to generate
-**검색만** 제공 — 생성할 별도의 모델을 제공합니다.
-answers, either a [frontier cloud model](frontier-model.md)
-답변은 [프론티어 클라우드 모델](frontier-model.md) 중 하나입니다.
-or a [local LLM](local-llm.md).
-또는 [로컬 LLM](local-llm.md).
-Whichever you pick, it
-어느 쪽을 선택하든지
-**must support tool calling** so it can invoke the `vivado_doc_search` tool.
-**도구 호출을 지원해야** `vivado_doc_search` 도구를 호출할 수 있습니다.
+  provides **retrieval only** — you supply a separate model to generate
+  **검색만** 제공 — 생성할 별도의 모델을 제공합니다.
+  answers, either a [frontier cloud model](frontier-model.md)
+  답변은 [프론티어 클라우드 모델](frontier-model.md) 중 하나입니다.
+  or a [local LLM](local-llm.md).
+  또는 [로컬 LLM](local-llm.md).
+  Whichever you pick, it
+  어느 쪽을 선택하든지
+  **must support tool calling** so it can invoke the `vivado_doc_search` tool.
+  **도구 호출을 지원해야** `vivado_doc_search` 도구를 호출할 수 있습니다.
 
   > **Why not a code-focused model?** Code models tend to answer from
   > **코드 중심 모델이 아닌 이유는 무엇입니까?** 코드 모델은
@@ -608,8 +589,10 @@ Whichever you pick, it
   > 이는 두 가지 모두에 적용됩니다.
   > frontier and local model choices.
   > 프론티어 및 지역 모델 선택.
+  >
 
 ### 2.4 File Layout
+
 ### 2.4 파일 레이아웃
 
 ```text
@@ -641,7 +624,9 @@ Package contents (the archive is flat — no wrapping folder):
 ---
 
 ## 3.
+
 ## Deployment
+
 ## 배포
 
 This guide is split into two phases, done in order, and only covers
@@ -659,16 +644,16 @@ its own document — come back here first.
 
 - **Phase 1 — 🌐 Connected machine.** Download everything into a *transfer
 - **1단계 — 🌐 연결된 머신.** 모든 것을 *전송으로 다운로드합니다.
-bundle* (a folder you move across the air gap).
-번들*(공극을 가로질러 이동하는 폴더).
-Nothing is installed
-아무것도 설치되지 않았습니다
-here.
-여기.
+  bundle* (a folder you move across the air gap).
+  번들*(공극을 가로질러 이동하는 폴더).
+  Nothing is installed
+  아무것도 설치되지 않았습니다
+  here.
+  여기.
 - **Phase 2 — 🔒 Air-gapped machine.** Install and configure everything
 - **2단계 — 🔒 에어갭 머신.** 모든 것을 설치하고 구성합니다.
-from that transfer bundle.
-해당 전송 번들에서.
+  from that transfer bundle.
+  해당 전송 번들에서.
 
 > **Same machine for both phases?
 > **두 단계 모두에 동일한 기계가 있습니까?
@@ -711,29 +696,30 @@ changes what you download:
 
 - **Option A — VS Code (recommended).** Most engineers already have it
 - **옵션 A - VS Code(권장).** 대부분의 엔지니어는 이미 VS Code를 보유하고 있습니다.
-installed, it has a familiar GUI with a built-in Chat/Agent view.
-설치하면 채팅/에이전트 보기가 내장된 친숙한 GUI가 있습니다.
-Works
-작품
-with either a frontier model (sign in normally) or a local model via
-프론티어 모델(일반적으로 로그인) 또는 로컬 모델을 통해
-**Bring Your Own Key (BYOK)** — no extra extension required either way.
-**BYOK(Bring Your Own Key)** — 어느 쪽이든 추가 확장이 필요하지 않습니다.
+  installed, it has a familiar GUI with a built-in Chat/Agent view.
+  설치하면 채팅/에이전트 보기가 내장된 친숙한 GUI가 있습니다.
+  Works
+  작품
+  with either a frontier model (sign in normally) or a local model via
+  프론티어 모델(일반적으로 로그인) 또는 로컬 모델을 통해
+  **Bring Your Own Key (BYOK)** — no extra extension required either way.
+  **BYOK(Bring Your Own Key)** — 어느 쪽이든 추가 확장이 필요하지 않습니다.
 - **Option B — OpenCode (optional).** A terminal-based AI client.
 - **옵션 B — OpenCode(선택 사항).** 터미널 기반 AI 클라이언트.
 - Install
 - 설치
-it only if you specifically prefer a CLI-driven workflow over an IDE.
-IDE보다 CLI 기반 워크플로를 특별히 선호하는 경우에만 사용하세요.
+  it only if you specifically prefer a CLI-driven workflow over an IDE.
+  IDE보다 CLI 기반 워크플로를 특별히 선호하는 경우에만 사용하세요.
 
-| You want<br>당신이 원하는 | Download in Phase 1<br>1단계에서 다운로드 | Install in Phase 2<br>2단계에서 설치 |
-|----------|---------------------|--------------------|
-| AMD Embedded Documentation MCP (required, this document)<br>AMD 임베디드 문서 MCP(필수, 이 문서) | Step 1<br>1단계 | Step 2<br>2단계 |
-| **VS Code** (recommended)<br>**VS 코드**(권장) | Step 2<br>2단계 | See client docs below<br>아래 클라이언트 문서를 참조하세요. |
-| **OpenCode** (optional)<br>**오픈코드**(선택사항) | Step 3<br>3단계 | See client docs below<br>아래 클라이언트 문서를 참조하세요. |
-| A local LLM (only if using the [Local LLM](local-llm.md) option)<br>로컬 LLM([로컬 LLM](local-llm.md) 옵션을 사용하는 경우에만) | See that document<br>해당 문서를 참조하세요 | See that document<br>해당 문서를 참조하세요 |
+| You want당신이 원하는                                                                                                     | Download in Phase 11단계에서 다운로드   | Install in Phase 22단계에서 설치                        |
+| ------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- | ------------------------------------------------------- |
+| AMD Embedded Documentation MCP (required, this document)AMD 임베디드 문서 MCP(필수, 이 문서)                              | Step 11단계                             | Step 22단계                                             |
+| **VS Code** (recommended)**VS 코드**(권장)                                                                    | Step 22단계                             | See client docs below아래 클라이언트 문서를 참조하세요. |
+| **OpenCode** (optional)**오픈코드**(선택사항)                                                                 | Step 33단계                             | See client docs below아래 클라이언트 문서를 참조하세요. |
+| A local LLM (only if using the [Local LLM](local-llm.md) option)로컬 LLM([로컬 LLM](local-llm.md) 옵션을 사용하는 경우에만) | See that document해당 문서를 참조하세요 | See that document해당 문서를 참조하세요                 |
 
 ### 3.1 Phase 1
+
 ### 3.1 1단계
 
 > **Getting the files across the air gap:** gather everything into one
@@ -810,16 +796,16 @@ Docker가 있으면 `transfer/Docker/`에 추가하세요.
 
 - **Linux (recommended):** the **Engine static tarball** (`docker-<version>.tgz`)
 - **Linux(권장):** **엔진 정적 타르볼**(`docker-<version>.tgz`)
-from <https://download.docker.com/linux/static/stable/> plus the **Compose
-<https://download.docker.com/linux/static/stable/> 및 **Compose에서
-plugin binary** (`docker-compose-linux-x86_64`) from
-플러그인 바이너리** (`docker-compose-linux-x86_64`)
-  <https://github.com/docker/compose/releases>. The static tarball is
-self-contained, so it avoids the offline `.deb`/`.rpm` dependency problem.
-독립적이므로 오프라인 `.deb`/`.rpm` 종속성 문제를 방지합니다.
+  from [https://download.docker.com/linux/static/stable/](https://download.docker.com/linux/static/stable/) plus the **Compose
+  [https://download.docker.com/linux/static/stable/](https://download.docker.com/linux/static/stable/) 및 **Compose에서
+  plugin binary** (`docker-compose-linux-x86_64`) from
+  플러그인 바이너리** (`docker-compose-linux-x86_64`)
+  [https://github.com/docker/compose/releases](https://github.com/docker/compose/releases). The static tarball is
+  self-contained, so it avoids the offline `.deb`/`.rpm` dependency problem.
+  독립적이므로 오프라인 `.deb`/`.rpm` 종속성 문제를 방지합니다.
 - **Windows:** the Docker Desktop installer, from
 - **Windows:** Docker Desktop 설치 프로그램, 출처:
-  <https://docs.docker.com/desktop/setup/install/windows-install/>.
+  [https://docs.docker.com/desktop/setup/install/windows-install/](https://docs.docker.com/desktop/setup/install/windows-install/).
 
 You do **not** need to stage any container images — the `amd-embedded-doc-search` package
 컨테이너 이미지(`amd-embedded-doc-search` 패키지)를 스테이징할 필요가 **없습니다**
@@ -832,8 +818,8 @@ already bundles them and loads them on first start.
 Download the installer for the **target machine's** OS into `transfer/VSCode/`:
 **대상 머신** OS용 설치 프로그램을 `transfer/VSCode/`에 다운로드합니다.
 
-- Download page: <https://code.visualstudio.com/download>
-- 다운로드 페이지: <https://code.visualstudio.com/download>
+- Download page: [https://code.visualstudio.com/download](https://code.visualstudio.com/download)
+- 다운로드 페이지: [https://code.visualstudio.com/download](https://code.visualstudio.com/download)
 - Windows: `VSCodeSetup.exe` · Ubuntu/Debian: `code.deb` · RHEL/Fedora: `code.rpm`
 - Windows: `VSCodeSetup.exe` · Ubuntu/Debian: `code.deb` · RHEL/Fedora: `code.rpm`
 
@@ -843,10 +829,10 @@ Download the installer for the **target machine's** OS into `transfer/VSCode/`:
 Only if you plan to use OpenCode instead of VS Code:
 VS Code 대신 OpenCode를 사용하려는 경우에만 다음을 수행하세요.
 
-- Releases: <https://github.com/sst/opencode/releases>
-- 릴리스: <https://github.com/sst/opencode/releases>
-- Docs: <https://opencode.ai/docs/>
-- 문서: <https://opencode.ai/docs/>
+- Releases: [https://github.com/sst/opencode/releases](https://github.com/sst/opencode/releases)
+- 릴리스: [https://github.com/sst/opencode/releases](https://github.com/sst/opencode/releases)
+- Docs: [https://opencode.ai/docs/](https://opencode.ai/docs/)
+- 문서: [https://opencode.ai/docs/](https://opencode.ai/docs/)
 
 **Step 4 — Confirm the transfer bundle is complete**
 **4단계 - 이전 번들이 완료되었는지 확인**
@@ -876,6 +862,7 @@ Now move the bundle to the air-gapped machine and continue with Phase 2.
 이제 번들을 에어 갭 머신으로 이동하고 2단계를 계속합니다.
 
 ### 3.2 Phase 2
+
 ### 3.2 2단계
 
 > **Known air-gap gotchas — skim these first**
@@ -892,48 +879,48 @@ Now move the bundle to the air-gapped machine and continue with Phase 2.
 >
 > - **`mcp` container stuck in `Created`** → the one-time documentation import
 > - **`mcp` 컨테이너가 `Created`에 멈춤** → 일회성 문서 가져오기
-> is still running (~10 min) → wait; watch it with
-> 여전히 실행 중입니다(~10분) → 기다리세요. 그걸로 지켜봐
-> `docker logs -f amd-embedded-doc-search-weaviate-docs-import-1`.
-> `docker 로그 -f amd-embedded-doc-search-weaviate-docs-import-1`.
-> It starts on its own.
-> 그것은 스스로 시작됩니다.
+>   is still running (~10 min) → wait; watch it with
+>   여전히 실행 중입니다(~10분) → 기다리세요. 그걸로 지켜봐
+>   `docker logs -f amd-embedded-doc-search-weaviate-docs-import-1`.
+>   `docker 로그 -f amd-embedded-doc-search-weaviate-docs-import-1`.
+>   It starts on its own.
+>   그것은 스스로 시작됩니다.
 > - **Client can't reach the server (`HTTP 000`)** → `localhost` resolved to
 > - **클라이언트가 서버에 연결할 수 없습니다(`HTTP 000`)** → `localhost`가 다음으로 확인되었습니다.
-> IPv6 `::1`, but Docker publishes on IPv4 → use **`127.0.0.1`** in the URL.
-> IPv6 `::1`, 그러나 Docker는 IPv4에 게시 → URL에 **`127.0.0.1`**을 사용합니다.
+>   IPv6 `::1`, but Docker publishes on IPv4 → use **`127.0.0.1`** in the URL.
+>   IPv6 `::1`, 그러나 Docker는 IPv4에 게시 → URL에 **`127.0.0.1`**을 사용합니다.
 > - **`permission denied … mkdir …/models`** → your home is on NFS with
 > - **`권한이 거부되었습니다 ... mkdir .../models`** → 집이 NFS에 있습니다.
-> `root_squash` (check `stat -f -c '%T' "$HOME"` → `nfs`) → keep deployment
-> `root_squash`(`stat -f -c '%T' "$HOME"` → `nfs` 확인) → 배포 유지
-> state on a **local disk**, not your NFS home — the quickest fix is
-> NFS 홈이 아닌 **로컬 디스크**에 상태를 저장합니다. 가장 빠른 해결 방법은 다음과 같습니다.
-> `export XDG_CONFIG_HOME=/local/path` before running any
-> 실행하기 전에 `XDG_CONFIG_HOME=/local/path` 내보내기
-> `amd-embedded-doc-search` command; it redirects config/data generation
-> `amd-embedded-doc-search` 명령; 구성/데이터 생성을 리디렉션합니다.
-> away from `~/.config` entirely.
-> `~/.config`에서 완전히 벗어나세요.
+>   `root_squash` (check `stat -f -c '%T' "$HOME"` → `nfs`) → keep deployment
+>   `root_squash`(`stat -f -c '%T' "$HOME"` → `nfs` 확인) → 배포 유지
+>   state on a **local disk**, not your NFS home — the quickest fix is
+>   NFS 홈이 아닌 **로컬 디스크**에 상태를 저장합니다. 가장 빠른 해결 방법은 다음과 같습니다.
+>   `export XDG_CONFIG_HOME=/local/path` before running any
+>   실행하기 전에 `XDG_CONFIG_HOME=/local/path` 내보내기
+>   `amd-embedded-doc-search` command; it redirects config/data generation
+>   `amd-embedded-doc-search` 명령; 구성/데이터 생성을 리디렉션합니다.
+>   away from `~/.config` entirely.
+>   `~/.config`에서 완전히 벗어나세요.
 > - **`configure` fails with `could not open a new TTY`** → its interactive UI
 > - **`configure`가 `새 TTY를 열 수 없습니다`**와 함께 실패 → 대화형 UI
-> needs a **real terminal** → run it in an interactive shell (or drive it
-> **실제 터미널**이 필요합니다 → 대화형 셸에서 실행(또는 구동)
-> through a `pty` wrapper for automation).
-> 자동화를 위한 'pty' 래퍼를 통해).
+>   needs a **real terminal** → run it in an interactive shell (or drive it
+>   **실제 터미널**이 필요합니다 → 대화형 셸에서 실행(또는 구동)
+>   through a `pty` wrapper for automation).
+>   자동화를 위한 'pty' 래퍼를 통해).
 > - **Offline `.deb`/`.rpm` install fails on dependencies** → package managers
 > - **종속성으로 인한 오프라인 `.deb`/`.rpm` 설치 실패** → 패키지 관리자
-> don't resolve deps offline → gather each package **with its dependencies**
-> deps를 오프라인으로 해결하지 마세요 → 각 패키지를 **종속성과 함께** 수집하세요
-> on the connected machine, or use **self-contained builds** (tarballs/static
-> 연결된 머신에서 실행하거나 **자체 포함 빌드**(타르볼/정적)를 사용하세요.
-> binaries).
-> 바이너리).
+>   don't resolve deps offline → gather each package **with its dependencies**
+>   deps를 오프라인으로 해결하지 마세요 → 각 패키지를 **종속성과 함께** 수집하세요
+>   on the connected machine, or use **self-contained builds** (tarballs/static
+>   연결된 머신에서 실행하거나 **자체 포함 빌드**(타르볼/정적)를 사용하세요.
+>   binaries).
+>   바이너리).
 > - **`docker ps` → `permission denied … docker.sock`** → you need **non-sudo
 > - **`docker ps` → `권한이 거부되었습니다. docker.sock`** → **non-sudo가 필요합니다.
-> Docker access** (the `docker` group) → on a secured host this is an admin
-> Docker 액세스**('docker' 그룹) → 보안 호스트에서는 관리자입니다.
-> action; ask your sysadmin.
-> 행동; 시스템 관리자에게 물어보세요.
+>   Docker access** (the `docker` group) → on a secured host this is an admin
+>   Docker 액세스**('docker' 그룹) → 보안 호스트에서는 관리자입니다.
+>   action; ask your sysadmin.
+>   행동; 시스템 관리자에게 물어보세요.
 
 **Step 1 — Install Docker (only if the machine doesn't already have it)**
 **1단계 - Docker 설치(머신에 아직 Docker가 없는 경우에만)**
@@ -946,8 +933,8 @@ server), so the target machine needs Docker. **Skip this step entirely if
 `docker ps`는 이미 작동합니다.**
 
 #### Linux (static tarball)
-#### Linux(정적 타르볼)
 
+#### Linux(정적 타르볼)
 
 Extract the Engine binaries onto your `PATH`:
 `PATH`에 엔진 바이너리를 추출합니다.
@@ -1011,13 +998,14 @@ sudo reboot
 ```
 
 #### Windows (Docker Desktop)
+
 #### Windows(도커 데스크탑)
 
 Run the **Docker Desktop** installer from `transfer/Docker/` (download it on
 `transfer/Docker/`에서 **Docker Desktop** 설치 프로그램을 실행합니다(다운로드:
 the connected machine from
 연결된 기계에서
-<https://docs.docker.com/desktop/setup/install/windows-install/>). Docker
+[https://docs.docker.com/desktop/setup/install/windows-install/](https://docs.docker.com/desktop/setup/install/windows-install/)). Docker
 Desktop bundles the Engine and the Compose plugin and runs them as a
 Desktop은 Engine과 Compose 플러그인을 번들로 묶어서 실행합니다.
 background service, so none of the Linux binary-copy, systemd, or
@@ -1080,7 +1068,7 @@ http://127.0.0.1:<DOCSEARCH_MCP_PORT>/mcp/doc-search
 
 Full command reference, flags, validation, and troubleshooting:
 전체 명령 참조, 플래그, 검증 및 문제 해결:
-**[Operate & Troubleshoot](operate.md)**.
+**[Operate &amp; Troubleshoot](operate.md)**.
 **[작동 및 문제 해결](operate.md)**.
 
 **Step 3 — Connect an answering model**
@@ -1091,17 +1079,19 @@ Continue with whichever fits your hardware and network policy:
 
 - [Frontier Model](frontier-model.md) —
 - [프론티어 모델](frontier-model.md) —
-no local-LLM hardware required, works on any laptop
-로컬 LLM 하드웨어가 필요하지 않으며 모든 노트북에서 작동합니다.
+  no local-LLM hardware required, works on any laptop
+  로컬 LLM 하드웨어가 필요하지 않으며 모든 노트북에서 작동합니다.
 - [Local LLM](local-llm.md) — fully
 - [로컬 LLM](local-llm.md) — 전체
-air-gapped end to end, requires GPU-class hardware
-엔드 투 엔드(air-gapped end-to-end), GPU급 하드웨어 필요
+  air-gapped end to end, requires GPU-class hardware
+  엔드 투 엔드(air-gapped end-to-end), GPU급 하드웨어 필요
 
 ---
 
 ## 4.
+
 ## Next Steps
+
 ## 다음 단계
 
 The RAG database is now deployed and validated.
@@ -1111,16 +1101,16 @@ Pick your answering model:
 
 - **No GPU / just want to try it quickly?** →
 - **GPU가 없습니다. 빨리 사용해 보고 싶으신가요?** →
-[Frontier Model](frontier-model.md)
-[프론티어 모델](frontier-model.md)
-(GitHub Copilot in VS Code, a few minutes of setup)
-(VS Code의 GitHub Copilot, 설정에 몇 분 소요)
+  [Frontier Model](frontier-model.md)
+  [프론티어 모델](frontier-model.md)
+  (GitHub Copilot in VS Code, a few minutes of setup)
+  (VS Code의 GitHub Copilot, 설정에 몇 분 소요)
 - **Need a fully air-gapped end-to-end deployment?** →
 - **완전히 에어갭이 있는 엔드투엔드 배포가 필요합니까?** →
-[Local LLM](local-llm.md) (AMD ROCm,
-[로컬 LLM](local-llm.md) (AMD ROCm,
-includes local-LLM setup and VRAM planning)
-로컬 LLM 설정 및 VRAM 계획 포함)
+  [Local LLM](local-llm.md) (AMD ROCm,
+  [로컬 LLM](local-llm.md) (AMD ROCm,
+  includes local-LLM setup and VRAM planning)
+  로컬 LLM 설정 및 VRAM 계획 포함)
 
 ---
 
