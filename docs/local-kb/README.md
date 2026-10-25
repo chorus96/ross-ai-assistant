@@ -38,25 +38,6 @@ Package contents (the archive is flat — no wrapping folder):
 
 ## 3. Deployment
 
-> **Same machine for both phases?
-> **두 단계 모두에 동일한 기계가 있습니까?
-> That's fine.** The two phases describe
-> 괜찮습니다.** 두 단계에서는 다음과 같이 설명합니다.
-> *network states*, not necessarily *two different machines*.
-> *네트워크 상태*, 반드시 *두 개의 서로 다른 시스템*일 필요는 없습니다.
-> If your
-> 만약 당신의
-> policy allows it, you can temporarily connect the target machine to the
-> 정책에서 허용하는 경우 대상 시스템을 임시로 연결할 수 있습니다.
-> Internet, complete Phase 1 directly on it (skipping the transfer-bundle
-> 인터넷에서 직접 1단계를 완료하세요(이전 번들 건너뛰기)
-> copy step), then disconnect it (unplug the cable, disable Wi-Fi, remove
-> 복사 단계) 그런 다음 연결을 끊습니다(케이블 분리, Wi-Fi 비활성화, 제거
-> the route — whatever "air-gapped" means in your environment) before
-> 경로 — 귀하의 환경에서 "air-gapped"가 의미하는 모든 것)
-> starting Phase 2.
-> 2단계 시작.
-
 > **Deploying with a frontier model instead?** The RAG database itself is
 > **대신 프론티어 모델을 사용하여 배포하시겠습니까?** RAG 데이터베이스 자체는
 > still deployed exactly as below (it never talks to the internet), but
@@ -102,8 +83,6 @@ changes what you download:
 | A local LLM (only if using the [Local LLM](local-llm.md) option)로컬 LLM([로컬 LLM](local-llm.md) 옵션을 사용하는 경우에만) | See that document해당 문서를 참조하세요 | See that document해당 문서를 참조하세요                 |
 
 ### 3.1 Phase 1
-
-### 3.1 1단계
 
 > **Getting the files across the air gap:** gather everything into one
 > **공극을 통해 파일 가져오기:** 모든 것을 하나로 모으기
@@ -246,8 +225,6 @@ Now move the bundle to the air-gapped machine and continue with Phase 2.
 
 ### 3.2 Phase 2
 
-### 3.2 2단계
-
 > **Known air-gap gotchas — skim these first**
 > **알려진 에어 갭 문제 — 먼저 훑어보세요**
 >
@@ -380,102 +357,9 @@ sudo usermod -aG docker $USER
 sudo reboot
 ```
 
-#### Windows (Docker Desktop)
-
-#### Windows(도커 데스크탑)
-
-Run the **Docker Desktop** installer from `transfer/Docker/` (download it on
-`transfer/Docker/`에서 **Docker Desktop** 설치 프로그램을 실행합니다(다운로드:
-the connected machine from
-연결된 기계에서
-[https://docs.docker.com/desktop/setup/install/windows-install/](https://docs.docker.com/desktop/setup/install/windows-install/)). Docker
-Desktop bundles the Engine and the Compose plugin and runs them as a
-Desktop은 Engine과 Compose 플러그인을 번들로 묶어서 실행합니다.
-background service, so none of the Linux binary-copy, systemd, or
-백그라운드 서비스이므로 Linux 바이너리 복사본, systemd 또는
-`docker`-group steps are needed.
-`docker` 그룹 단계가 필요합니다.
-
-When installation finishes and the Docker Desktop dashboard shows **Engine
-설치가 완료되고 Docker Desktop 대시보드에 **Engine이 표시되면
-running**, continue.
-실행**, 계속하세요.
-
-Confirm Docker is working before continuing (Linux: no `sudo` needed):
-계속하기 전에 Docker가 작동하는지 확인하세요(Linux: `sudo` 필요 없음).
-
-```bash
-docker ps
-```
-
-**Step 2 — Install the AMD Embedded Documentation MCP server (required)**
-**2단계 - AMD Embedded Documentation MCP 서버 설치(필수)**
-
-Extract the package you copied into `transfer/MCP/`, then check the environment
-`transfer/MCP/`에 복사한 패키지를 추출한 후 환경을 확인하세요.
-and bring the stack up.
-그리고 스택을 올려보세요.
-Unlike older drops, the archive is **flat** — it
-이전 드롭과 달리 아카이브는 **플랫**입니다.
-extracts directly into the current directory, with no wrapping folder to `cd`
-`cd`에 대한 래핑 폴더 없이 현재 디렉토리로 직접 추출합니다.
-into:
-에:
-
-```bash
-tar -xvzf transfer/MCP/<package>.tar.gz
-./amd-embedded-doc-search doctor            # verify Docker is ready
-./amd-embedded-doc-search configure --start # generate config and start the stack
-```
-
-> **On Windows**
-> **Windows의 경우**
->
-> The `tar` command above is the same, but run the CLI with the `.exe` build
-> 위의 `tar` 명령은 동일하지만 `.exe` 빌드로 CLI를 실행합니다.
-> from PowerShell — e.g.
-> PowerShell에서 - 예:
-> `.\amd-embedded-doc-search.exe doctor` and
-> `.\amd-embedded-doc-search.exe doctor` 및
-> `.\amd-embedded-doc-search.exe configure --start`.
-> `.\amd-embedded-doc-search.exe 구성 --start`.
-
-The MCP port is chosen during `configure` and saved in
-MCP 포트는 '구성' 중에 선택되어 다음 위치에 저장됩니다.
-`~/.config/amd-embedded-doc-search/.env` as `DOCSEARCH_MCP_PORT` (default `8080`):
-`~/.config/amd-embedded-doc-search/.env`를 `DOCSEARCH_MCP_PORT`로(기본값 `8080`):
-
-```text
-http://127.0.0.1:<DOCSEARCH_MCP_PORT>/mcp/doc-search
-```
-
-Full command reference, flags, validation, and troubleshooting:
-전체 명령 참조, 플래그, 검증 및 문제 해결:
-**[Operate &amp; Troubleshoot](operate.md)**.
-**[작동 및 문제 해결](operate.md)**.
-
-**Step 3 — Connect an answering model**
-**3단계 - 응답 모델 연결**
-
-Continue with whichever fits your hardware and network policy:
-하드웨어 및 네트워크 정책에 맞는 것을 계속 진행하세요.
-
-- [Frontier Model](frontier-model.md) —
-- [프론티어 모델](frontier-model.md) —
-  no local-LLM hardware required, works on any laptop
-  로컬 LLM 하드웨어가 필요하지 않으며 모든 노트북에서 작동합니다.
-- [Local LLM](local-llm.md) — fully
-- [로컬 LLM](local-llm.md) — 전체
-  air-gapped end to end, requires GPU-class hardware
-  엔드 투 엔드(air-gapped end-to-end), GPU급 하드웨어 필요
-
 ---
 
-## 4.
-
-## Next Steps
-
-## 다음 단계
+## 4. Next Steps
 
 The RAG database is now deployed and validated.
 이제 RAG 데이터베이스가 배포되고 검증되었습니다.
