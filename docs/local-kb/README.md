@@ -294,8 +294,6 @@ server), so the target machine needs Docker. **Skip this step entirely if
 
 #### Linux (static tarball)
 
-#### Linux(정적 타르볼)
-
 Extract the Engine binaries onto your `PATH`:
 `PATH`에 엔진 바이너리를 추출합니다.
 
