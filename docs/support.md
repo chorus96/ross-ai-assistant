@@ -1,4 +1,5 @@
 <!-- ko-translation: enabled -->
+
 <!--
 Copyright (C) 2026, Advanced Micro Devices, Inc.
 저작권 (C) 2026, Advanced Micro Devices, Inc.
@@ -9,18 +10,8 @@ SPDX-라이센스-식별자: MIT
 -->
 
 # Support
-# 지원
 
 ## Getting Help
-## 도움 받기
-
-Use the official AMD Adaptive Support community.
-공식 AMD 적응형 지원 커뮤니티를 이용하세요.
-Post questions, issues, and workflows there so other users and AMD can help.
-다른 사용자와 AMD가 도움을 줄 수 있도록 질문, 문제 및 워크플로를 게시하세요.
-
-**[AMD Adaptive Support](https://adaptivesupport.amd.com/s/?language=en_US)**
-**[AMD 적응형 지원](https://adaptivesupport.amd.com/s/?언어=en_US)**
 
 - **Post questions and issues** — search existing articles and discussions first, then open a new thread if needed
 - **질문 및 문제 게시** - 기존 기사와 토론을 먼저 검색한 다음 필요한 경우 새 스레드를 엽니다.
@@ -30,40 +21,43 @@ Post questions, issues, and workflows there so other users and AMD can help.
 - **최신 정보를 받아보세요** — 제품 업데이트 및 알려진 문제는 Adaptive Support에 게시됩니다.
 
 ### Reporting Issues
+
 ### 보고 문제
 
 When reporting an issue on the forum, please include:
 포럼에 문제를 보고할 때 다음 사항을 포함해 주세요.
 
 1. **Tool and version** — IDE/CLI tool name and version, MCP server version, extension version
-1. **도구 및 버전** — IDE/CLI 도구 이름 및 버전, MCP 서버 버전, 확장 버전
-2. **Vivado/HLS version** — Output of `version` in the Vivado Tcl console, or `vitis-run --version`
-2. **Vivado/HLS 버전** — Vivado Tcl 콘솔의 `version` 출력 또는 `vitis-run --version`
-3. **Steps to reproduce** — What you asked the agent and what happened
-3. **재현 단계** — 상담원에게 문의한 내용과 발생한 일
-4. **Logs** — Relevant logs from:
-4. **로그** — 관련 로그:
-    - Vivado Tcl console output or HLS build log
-    - Vivado Tcl 콘솔 출력 또는 HLS 빌드 로그
-    - MCP server output (check your IDE's Output panel > Vivado MCP)
-    - MCP 서버 출력(IDE의 출력 패널 > Vivado MCP 확인)
-    - Agent conversation transcript
-    - 상담원 대화 내용
-5. **Design context** — Target device, design size, which skill was used
-5. **디자인 컨텍스트** — 대상 장치, 디자인 크기, 사용된 스킬
+2. **도구 및 버전** — IDE/CLI 도구 이름 및 버전, MCP 서버 버전, 확장 버전
+3. **Vivado/HLS version** — Output of `version` in the Vivado Tcl console, or `vitis-run --version`
+4. **Vivado/HLS 버전** — Vivado Tcl 콘솔의 `version` 출력 또는 `vitis-run --version`
+5. **Steps to reproduce** — What you asked the agent and what happened
+6. **재현 단계** — 상담원에게 문의한 내용과 발생한 일
+7. **Logs** — Relevant logs from:
+8. **로그** — 관련 로그:
+   - Vivado Tcl console output or HLS build log
+   - Vivado Tcl 콘솔 출력 또는 HLS 빌드 로그
+   - MCP server output (check your IDE's Output panel > Vivado MCP)
+   - MCP 서버 출력(IDE의 출력 패널 > Vivado MCP 확인)
+   - Agent conversation transcript
+   - 상담원 대화 내용
+9. **Design context** — Target device, design size, which skill was used
+10. **디자인 컨텍스트** — 대상 장치, 디자인 크기, 사용된 스킬
 
 ## Known Limitations
+
 ## 알려진 제한 사항
 
-| Limitation<br>한계 | Workaround<br>해결 방법 |
-|------------|------------|
-| LSF tool (`vivado_lsf`) only works inside the AMD network<br>LSF 도구(`vivado_lsf`)는 AMD 네트워크 내부에서만 작동합니다. | Use `vivado_ssh` for remote deployment outside AMD. LSF support for external customers is planned for a future release<br>AMD 외부의 원격 배포에는 'vivado_ssh'를 사용하세요. 외부 고객을 위한 LSF 지원은 향후 릴리스에서 계획되어 있습니다. |
-| GUI mode may open on a virtual/VNC display instead of your native display<br>기본 디스플레이 대신 가상/VNC 디스플레이에서 GUI 모드가 열릴 수 있습니다. | Tell the agent your display value, e.g. *"use display :0"* or *"use my $DISPLAY"*. Run `echo $DISPLAY` in your terminal to find it<br>상담원에게 표시 값을 알려주세요. *"디스플레이 사용:0"* 또는 *"내 $DISPLAY 사용"*. 찾으려면 터미널에서 `echo $DISPLAY`를 실행하세요. |
-| Long-running Vivado commands may cause the chat to stop waiting for a response<br>오랫동안 실행되는 Vivado 명령으로 인해 채팅이 응답 대기를 중지할 수 있습니다. | Ask the agent to *"check status"* or *"continue"*. This is an AI infrastructure limitation, not specific to the MCP server<br>상담원에게 *"상태 확인"* 또는 *"계속"*을 요청하세요. 이는 MCP 서버에만 국한된 것이 아닌 AI 인프라 제한 사항입니다. |
-| The agent may interpret "visualize the design" as taking GUI screenshots via `vivado_computer_use`<br>에이전트는 'vivado_computer_use'를 통해 GUI 스크린샷을 찍는 것으로 '디자인 시각화'를 해석할 수 있습니다. | Disable the `vivado_computer_use` tool if you do not need automated GUI interaction<br>자동화된 GUI 상호작용이 필요하지 않은 경우 'vivado_computer_use' 도구를 비활성화하세요. |
-| Some LLMs may not automatically call `vivado_doc_search` for knowledge queries<br>일부 LLM은 지식 쿼리에 대해 'vivado_doc_search'를 자동으로 호출하지 않을 수 있습니다. | Add a system prompt instructing the agent to *"always use vivado_doc_search for AMD/Xilinx documentation questions"*, or explicitly state in your query: *"use vivado_doc_search to look up..."*. More capable models generally handle tool selection reliably; smaller or older models may need this guidance<br>*"AMD/Xilinx 문서 관련 질문에는 항상 vivado_doc_search를 사용하세요"*라고 에이전트에 지시하는 시스템 프롬프트를 추가하거나 쿼리에 명시적으로 명시하세요. *"조회하려면 vivado_doc_search를 사용하세요..."*. 보다 유능한 모델은 일반적으로 도구 선택을 안정적으로 처리합니다. 더 작거나 오래된 모델에는 이 지침이 필요할 수 있습니다. |
+| Limitation한계                                                                                                                                                                                               | Workaround해결 방법                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| LSF tool (`vivado_lsf`) only works inside the AMD networkLSF 도구(`vivado_lsf`)는 AMD 네트워크 내부에서만 작동합니다.                                                                                    | Use `vivado_ssh` for remote deployment outside AMD. LSF support for external customers is planned for a future releaseAMD 외부의 원격 배포에는 'vivado_ssh'를 사용하세요. 외부 고객을 위한 LSF 지원은 향후 릴리스에서 계획되어 있습니다.                                                                                                                                                                                                                                                                                                                                                                                                              |
+| GUI mode may open on a virtual/VNC display instead of your native display기본 디스플레이 대신 가상/VNC 디스플레이에서 GUI 모드가 열릴 수 있습니다.                                                           | Tell the agent your display value, e.g. *"use display :0"* or *"use my $DISPLAY"*. Run `echo $DISPLAY` in your terminal to find it상담원에게 표시 값을 알려주세요. *"디스플레이 사용:0"* 또는 *"내 $DISPLAY 사용"*. 찾으려면 터미널에서 `echo $DISPLAY`를 실행하세요.                                                                                                                                                                                                                                                                                                                                                                       |
+| Long-running Vivado commands may cause the chat to stop waiting for a response오랫동안 실행되는 Vivado 명령으로 인해 채팅이 응답 대기를 중지할 수 있습니다.                                                  | Ask the agent to *"check status"* or *"continue"*. This is an AI infrastructure limitation, not specific to the MCP server상담원에게 *"상태 확인"* 또는 *"계속"*을 요청하세요. 이는 MCP 서버에만 국한된 것이 아닌 AI 인프라 제한 사항입니다.                                                                                                                                                                                                                                                                                                                                                                                                      |
+| The agent may interpret "visualize the design" as taking GUI screenshots via `vivado_computer_use`에이전트는 'vivado_computer_use'를 통해 GUI 스크린샷을 찍는 것으로 '디자인 시각화'를 해석할 수 있습니다. | Disable the `vivado_computer_use` tool if you do not need automated GUI interaction자동화된 GUI 상호작용이 필요하지 않은 경우 'vivado_computer_use' 도구를 비활성화하세요.                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| Some LLMs may not automatically call `vivado_doc_search` for knowledge queries일부 LLM은 지식 쿼리에 대해 'vivado_doc_search'를 자동으로 호출하지 않을 수 있습니다.                                        | Add a system prompt instructing the agent to *"always use vivado_doc_search for AMD/Xilinx documentation questions"*, or explicitly state in your query: *"use vivado_doc_search to look up..."*. More capable models generally handle tool selection reliably; smaller or older models may need this guidance*"AMD/Xilinx 문서 관련 질문에는 항상 vivado_doc_search를 사용하세요"*라고 에이전트에 지시하는 시스템 프롬프트를 추가하거나 쿼리에 명시적으로 명시하세요. *"조회하려면 vivado_doc_search를 사용하세요..."*. 보다 유능한 모델은 일반적으로 도구 선택을 안정적으로 처리합니다. 더 작거나 오래된 모델에는 이 지침이 필요할 수 있습니다. |
 
 ## Providing Feedback
+
 ## 피드백 제공
 
 Your feedback directly shapes the product.
